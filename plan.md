@@ -1754,3 +1754,56 @@ Documents List
 экран → endpoint’ы
 экран → сущности
 экран → create/read/update actions
+
+Структуру админки создал как отдельный модуль в src/modules/admin, с layout, router-файлом, компонентами оболочки и набором страниц-заготовок.
+Что появилось:
+layout админки: src/modules/admin/layouts/AdminLayout.vue (line 1)
+общие компоненты:AdminHeader.vue (line 1)
+AdminSidebar.vue (line 1)
+AdminPageStub.vue (line 1)
+
+роуты админки: src/modules/admin/router/admin-routes.ts (line 1)
+подключение в основной роутер: src/router/index.ts (line 1)
+Страницы-заготовки созданы по разделам:
+auth:LoginPage.vue (line 1)
+SelectSchoolPage.vue (line 1)
+
+dashboard:DashboardPage.vue (line 1)
+
+settings:GeneralPage.vue (line 1)
+ContactsPage.vue (line 1)
+BrandingPage.vue (line 1)
+HomepagePage.vue (line 1)
+
+design:TemplatesPage.vue (line 1)
+ThemesPage.vue (line 1)
+CustomizePage.vue (line 1)
+PreviewPage.vue (line 1)
+
+structure:ModulesPage.vue (line 1)
+NavigationPage.vue (line 1)
+HomeBlocksPage.vue (line 1)
+
+content:NewsListPage.vue (line 1)
+NewsEditPage.vue (line 1)
+DocumentsListPage.vue (line 1)
+DocumentEditPage.vue (line 1)
+
+users:UsersListPage.vue (line 1)
+InviteUserPage.vue (line 1)
+
+system:PublishingPage.vue (line 1)
+HistoryPage.vue (line 1)
+
+Маршруты уже есть в виде каркаса:
+/admin/login
+/admin/select-school
+/admin/school/:slug/...
+Сборка проходит: npm run build.
+Логичный следующий шаг: начать не со всех страниц сразу, а с базы.
+Я бы делал так:
+подключить mock auth и guard’ы для /admin
+оживить SelectSchoolPage
+реализовать DashboardPage
+затем GeneralPage и TemplatesPage
+Если хотите, следующим сообщением я начну именно с admin auth scaffold + route guards + school selection mock.

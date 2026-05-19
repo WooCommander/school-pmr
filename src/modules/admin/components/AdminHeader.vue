@@ -1,12 +1,25 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useRoute } from 'vue-router'
+import { getAdminRoleForSchool, logoutAdmin, useAdminAuth } from '@/modules/admin/state/admin-auth'
 
 const route = useRoute()
+const router = useRouter()
+const { currentUser } = useAdminAuth()
 
 const schoolSlug = computed(() =>
   typeof route.params.slug === 'string' ? route.params.slug : null
 )
+
+const role = computed(() =>
+  schoolSlug.value ? getAdminRoleForSchool(schoolSlug.value) : null
+)
+
+async function signOut() {
+  logoutAdmin()
+  await router.push({ name: 'admin-login' })
+}
 </script>
 
 <template>
@@ -16,11 +29,15 @@ const schoolSlug = computed(() =>
       <h1 class="admin-header__title">
         {{ schoolSlug ? `Школа: ${schoolSlug}` : 'Админка' }}
       </h1>
+      <p v-if="currentUser" class="admin-header__meta">
+        {{ currentUser.name }}<span v-if="role"> • {{ role }}</span>
+      </p>
     </div>
 
     <div class="admin-header__actions">
       <button class="admin-header__btn">Предпросмотр</button>
       <button class="admin-header__btn admin-header__btn--primary">Опубликовать</button>
+      <button class="admin-header__btn" @click="signOut">Выйти</button>
     </div>
   </header>
 </template>
@@ -58,6 +75,12 @@ const schoolSlug = computed(() =>
 .admin-header__actions {
   display: flex;
   gap: 10px;
+}
+
+.admin-header__meta {
+  margin-top: 6px;
+  font-size: 13px;
+  color: $text-secondary;
 }
 
 .admin-header__btn {

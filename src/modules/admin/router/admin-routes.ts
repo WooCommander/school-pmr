@@ -5,15 +5,31 @@ export const adminRoutes: RouteRecordRaw[] = [
     path: '/admin/login',
     name: 'admin-login',
     component: () => import('@/modules/admin/pages/LoginPage.vue'),
+    meta: {
+      guestOnly: true,
+    },
+  },
+  {
+    path: '/admin',
+    redirect: {
+      name: 'admin-select-school',
+    },
   },
   {
     path: '/admin/select-school',
     name: 'admin-select-school',
     component: () => import('@/modules/admin/pages/SelectSchoolPage.vue'),
+    meta: {
+      requiresAdminAuth: true,
+    },
   },
   {
     path: '/admin/school/:slug',
     component: () => import('@/modules/admin/layouts/AdminLayout.vue'),
+    meta: {
+      requiresAdminAuth: true,
+      requiresSchoolAccess: true,
+    },
     children: [
       {
         path: 'dashboard',

@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { adminRoutes } from '@/modules/admin/router/admin-routes'
+import { hasAdminAccessToSchool, useAdminAuth } from '@/modules/admin/state/admin-auth'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -66,4 +67,34 @@ export const router = createRouter({
     },
     ...adminRoutes,
   ],
+})
+
+router.beforeEach((to) => {
+  const { state, isAuthenticated } = useAdminAuth()
+  const needsAuth = !!to.meta.requiresAdminAuth
+  const guestOnly = !!to.meta.guestOnly
+  const needsSchoolAccess = !!to.meta.requiresSchoolAccess
+  const schoolSlug = typeof to.params.slug === 'string' ? to.params.slug : null
+
+  if (guestOnly && isAuthenticated.value) {
+    if (state.selectedSchoolSlug) {
+      return { name: 'admin-school-dashboard', params: { slug: state.selectedSchoolSlug } }
+    }
+
+    return { name: 'admin-select-school' }
+  }
+
+  if (needsAuth && !isAuthenticated.value) {
+    return { name: 'admin-login' }
+  }
+
+  if (needsSchoolAccess && schoolSlug && !hasAdminAccessToSchool(schoolSlug)) {
+    if (state.selectedSchoolSlug && hasAdminAccessToSchool(state.selectedSchoolSlug)) {
+      return { name: 'admin-school-dashboard', params: { slug: state.selectedSchoolSlug } }
+    }
+
+    return { name: 'admin-select-school' }
+  }
+
+  return true
 })
