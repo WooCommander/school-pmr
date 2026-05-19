@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { documents, documentCategories } from '@/data/documents'
+import { getDocumentsBySchool, documentCategories } from '@/data/documents'
+import { useCurrentSchool } from '@/composables/useCurrentSchool'
 
+const { school } = useCurrentSchool()
 const activeCategory = ref('Все')
+
+const schoolDocuments = computed(() => getDocumentsBySchool(school.value.slug))
 
 const filtered = computed(() =>
   activeCategory.value === 'Все'
-    ? documents
-    : documents.filter(d => d.category === activeCategory.value)
+    ? schoolDocuments.value
+    : schoolDocuments.value.filter(d => d.category === activeCategory.value)
 )
 
 function formatDate(d: string) {
@@ -21,7 +25,6 @@ function formatDate(d: string) {
       <h1 class="page-title">Документы</h1>
       <p class="page-subtitle">Нормативные и локальные акты школы</p>
 
-      <!-- category tabs -->
       <div class="tabs" role="tablist">
         <button
           v-for="cat in documentCategories"
@@ -36,7 +39,6 @@ function formatDate(d: string) {
         </button>
       </div>
 
-      <!-- list -->
       <div class="doc-list">
         <div
           v-for="doc in filtered"

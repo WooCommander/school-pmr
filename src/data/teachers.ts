@@ -1,5 +1,6 @@
 export interface Teacher {
   id: number
+  schoolSlug: string
   name: string
   position: string
   subject: string
@@ -12,6 +13,7 @@ export interface Teacher {
 export const teachers: Teacher[] = [
   {
     id: 1,
+    schoolSlug: 'dnestrovsk-school-1',
     name: 'Иванова Светлана Николаевна',
     position: 'Директор',
     subject: 'Математика',
@@ -21,6 +23,7 @@ export const teachers: Teacher[] = [
   },
   {
     id: 2,
+    schoolSlug: 'dnestrovsk-school-1',
     name: 'Петров Андрей Викторович',
     position: 'Заместитель директора по учебной работе',
     subject: 'Русский язык и литература',
@@ -30,6 +33,7 @@ export const teachers: Teacher[] = [
   },
   {
     id: 3,
+    schoolSlug: 'dnestrovsk-school-1',
     name: 'Сергеева Ольга Ивановна',
     position: 'Учитель',
     subject: 'Математика и информатика',
@@ -38,6 +42,7 @@ export const teachers: Teacher[] = [
   },
   {
     id: 4,
+    schoolSlug: 'dnestrovsk-school-1',
     name: 'Козлов Михаил Петрович',
     position: 'Учитель',
     subject: 'История и обществознание',
@@ -46,6 +51,7 @@ export const teachers: Teacher[] = [
   },
   {
     id: 5,
+    schoolSlug: 'dnestrovsk-school-1',
     name: 'Морозова Татьяна Александровна',
     position: 'Учитель',
     subject: 'Английский язык',
@@ -54,6 +60,7 @@ export const teachers: Teacher[] = [
   },
   {
     id: 6,
+    schoolSlug: 'dnestrovsk-school-1',
     name: 'Алексеев Дмитрий Сергеевич',
     position: 'Учитель физической культуры',
     subject: 'Физическая культура',
@@ -62,14 +69,83 @@ export const teachers: Teacher[] = [
   },
   {
     id: 7,
-    name: 'Захарова Наталья Юрьевна',
+    schoolSlug: 'school-2',
+    name: 'Бондаренко Марина Сергеевна',
+    position: 'Директор',
+    subject: 'Русский язык и литература',
+    category: 'Высшая',
+    experience: 24,
+    email: 'director@school2.edu-pmr.org',
+  },
+  {
+    id: 8,
+    schoolSlug: 'school-2',
+    name: 'Сидоров Павел Игоревич',
     position: 'Учитель',
-    subject: 'Биология и химия',
+    subject: 'Физика',
+    category: 'Высшая',
+    experience: 18,
+  },
+  {
+    id: 9,
+    schoolSlug: 'school-2',
+    name: 'Коваленко Ирина Викторовна',
+    position: 'Учитель',
+    subject: 'Начальные классы',
     category: 'Первая',
     experience: 13,
   },
   {
-    id: 8,
+    id: 10,
+    schoolSlug: 'school-3',
+    name: 'Филиппов Александр Николаевич',
+    position: 'Директор',
+    subject: 'История',
+    category: 'Высшая',
+    experience: 21,
+    email: 'director@school3.edu-pmr.org',
+  },
+  {
+    id: 11,
+    schoolSlug: 'school-3',
+    name: 'Ткаченко Елена Олеговна',
+    position: 'Учитель',
+    subject: 'Биология и химия',
+    category: 'Первая',
+    experience: 16,
+  },
+  {
+    id: 12,
+    schoolSlug: 'school-4',
+    name: 'Мельник Ольга Романовна',
+    position: 'Директор',
+    subject: 'Математика',
+    category: 'Высшая',
+    experience: 26,
+    email: 'director@school4.edu-pmr.org',
+  },
+  {
+    id: 13,
+    schoolSlug: 'school-4',
+    name: 'Гончарук Виктор Петрович',
+    position: 'Учитель',
+    subject: 'Технология',
+    category: 'Первая',
+    experience: 11,
+  },
+  {
+    id: 14,
+    schoolSlug: 'lyceum-1',
+    name: 'Захарова Наталья Юрьевна',
+    position: 'Директор',
+    subject: 'Биология',
+    category: 'Высшая',
+    experience: 23,
+    email: 'director@lyceum1.edu-pmr.org',
+  },
+  {
+    id: 15,
+    schoolSlug: 'lyceum-1',
     name: 'Тимофеев Игорь Владимирович',
     position: 'Учитель',
     subject: 'Физика',
@@ -77,35 +153,17 @@ export const teachers: Teacher[] = [
     experience: 25,
   },
   {
-    id: 9,
-    name: 'Воронова Елена Геннадьевна',
-    position: 'Учитель начальных классов',
-    subject: 'Начальные классы',
-    category: 'Высшая',
-    experience: 20,
-  },
-  {
-    id: 10,
+    id: 16,
+    schoolSlug: 'lyceum-1',
     name: 'Белова Анна Константиновна',
-    position: 'Учитель начальных классов',
-    subject: 'Начальные классы',
-    category: 'Первая',
-    experience: 11,
-  },
-  {
-    id: 11,
-    name: 'Степанов Роман Евгеньевич',
     position: 'Учитель',
-    subject: 'Технология',
-    category: 'Вторая',
-    experience: 7,
-  },
-  {
-    id: 12,
-    name: 'Фёдорова Людмила Борисовна',
-    position: 'Педагог-психолог',
-    subject: 'Психология',
+    subject: 'Английский язык',
     category: 'Первая',
-    experience: 14,
+    experience: 12,
   },
 ]
+
+export function getTeachersBySchool(schoolSlug: string) {
+  const schoolTeachers = teachers.filter((teacher) => teacher.schoolSlug === schoolSlug)
+  return schoolTeachers.length ? schoolTeachers : teachers.filter((teacher) => teacher.schoolSlug === 'dnestrovsk-school-1')
+}

@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { teachers } from '@/data/teachers'
+import { getTeachersBySchool } from '@/data/teachers'
+import { useCurrentSchool } from '@/composables/useCurrentSchool'
 
+const { school } = useCurrentSchool()
 const search = ref('')
+
+const schoolTeachers = computed(() => getTeachersBySchool(school.value.slug))
 
 const filtered = computed(() => {
   const q = search.value.toLowerCase()
-  if (!q) return teachers
-  return teachers.filter(t =>
+  if (!q) return schoolTeachers.value
+  return schoolTeachers.value.filter(t =>
     t.name.toLowerCase().includes(q) ||
     t.subject.toLowerCase().includes(q)
   )
@@ -35,7 +39,7 @@ function avatarColor(id: number) {
   <div class="section">
     <div class="container">
       <h1 class="page-title">Педагогический коллектив</h1>
-      <p class="page-subtitle">{{ teachers.length }} специалистов</p>
+      <p class="page-subtitle">{{ schoolTeachers.length }} специалистов</p>
 
       <div class="search-wrap">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="search-icon" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>

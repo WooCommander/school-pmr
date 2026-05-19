@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { bells, sampleSchedule, classGroups, weekDays } from '@/data/schedule'
+import { useCurrentSchool } from '@/composables/useCurrentSchool'
 
+const { school } = useCurrentSchool()
 const selectedClass = ref('5А')
 
 const schedule = computed(() =>
@@ -17,6 +19,7 @@ function getLesson(dayIdx: number, lessonIdx: number) {
   <div class="section">
     <div class="container">
       <h1 class="page-title">Расписание</h1>
+      <p class="page-subtitle">Актуальное расписание занятий для {{ school.fullName }}</p>
 
       <div class="class-selector">
         <label class="class-selector__label" for="class-select">Класс:</label>
