@@ -189,7 +189,7 @@ function avatarColor(id: number) {
 .teacher-card__category {
   font-size: 11px;
   background: rgba($gold, .12);
-  color: darken($gold, 20%);
+  color: #7d5631;
   padding: 2px 8px;
   border-radius: 12px;
 }

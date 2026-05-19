@@ -28,7 +28,6 @@ const filtered = computed(() =>
       <h1 class="page-title">Новости</h1>
       <p class="page-subtitle">Актуальные события школьной жизни</p>
 
-      <!-- filters -->
       <div class="filters" role="group" aria-label="Фильтр по категории">
         <button
           v-for="cat in categories"
@@ -41,7 +40,6 @@ const filtered = computed(() =>
         </button>
       </div>
 
-      <!-- news list -->
       <Transition name="fade" mode="out-in">
         <div :key="activeCategory" class="news-grid">
           <NewsCard v-for="item in filtered" :key="item.id" :item="item" />

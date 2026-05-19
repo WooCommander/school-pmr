@@ -37,7 +37,6 @@ img {
   display: block;
 }
 
-// Utility
 .container {
   max-width: $max-content-width;
   margin: 0 auto;
@@ -53,7 +52,7 @@ img {
 
   @media (max-width: $mobile-breakpoint) {
     padding-top: $header-height-mobile;
-    padding-bottom: 64px; // bottom nav
+    padding-bottom: 64px;
   }
 }
 
@@ -87,7 +86,6 @@ img {
   }
 }
 
-// Badges
 .badge {
   display: inline-block;
   padding: 3px 10px;
@@ -95,14 +93,13 @@ img {
   font-size: 11px;
   font-weight: 500;
 
-  &--events   { background: rgba($cat-events, .12);   color: darken($cat-events, 20%); }
+  &--events   { background: rgba($cat-events, .12);   color: #8d6a13; }
   &--announce { background: rgba($cat-announce, .1);  color: $cat-announce; }
   &--sport    { background: rgba($cat-sport, .1);     color: $cat-sport; }
   &--olympiad { background: rgba($cat-olympiad, .1);  color: $cat-olympiad; }
   &--other    { background: $surface-2; color: $text-secondary; }
 }
 
-// Buttons
 .btn {
   display: inline-flex;
   align-items: center;
@@ -135,7 +132,6 @@ img {
   }
 }
 
-// Page title
 .page-title {
   font-size: 28px;
   font-weight: 600;
@@ -153,7 +149,6 @@ img {
   margin-bottom: 28px;
 }
 
-// Empty state
 .empty-state {
   text-align: center;
   padding: 60px 20px;

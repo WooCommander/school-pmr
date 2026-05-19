@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
 import { type NewsItem, categoryLabels } from '@/data/news'
 
 defineProps<{
   item: NewsItem
   horizontal?: boolean
 }>()
+
+const route = useRoute()
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -13,7 +16,7 @@ function formatDate(d: string) {
 
 <template>
   <router-link
-    :to="{ name: 'news-detail', params: { id: item.id } }"
+    :to="{ name: 'school-news-detail', params: { slug: route.params.slug, id: item.id } }"
     class="news-card"
     :class="{ 'news-card--horizontal': horizontal }"
   >

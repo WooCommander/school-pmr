@@ -7,6 +7,10 @@ const selectedClass = ref('5А')
 const schedule = computed(() =>
   sampleSchedule[selectedClass.value] ?? null
 )
+
+function getLesson(dayIdx: number, lessonIdx: number) {
+  return schedule.value?.[dayIdx]?.[lessonIdx] ?? null
+}
 </script>
 
 <template>
@@ -14,7 +18,6 @@ const schedule = computed(() =>
     <div class="container">
       <h1 class="page-title">Расписание</h1>
 
-      <!-- class selector -->
       <div class="class-selector">
         <label class="class-selector__label" for="class-select">Класс:</label>
         <div class="class-select-wrap">
@@ -28,7 +31,6 @@ const schedule = computed(() =>
         </div>
       </div>
 
-      <!-- bells reference -->
       <div class="bells-card">
         <h2 class="bells-card__title">Расписание звонков</h2>
         <div class="bells-grid">
@@ -40,7 +42,6 @@ const schedule = computed(() =>
         </div>
       </div>
 
-      <!-- schedule table -->
       <div v-if="schedule" class="schedule-wrap">
         <h2 class="schedule-title">Расписание {{ selectedClass }}</h2>
         <div class="schedule-table-scroll">
@@ -68,10 +69,10 @@ const schedule = computed(() =>
                   :key="day"
                   class="schedule-table__cell"
                 >
-                  <template v-if="schedule[dayIdx]?.[lessonIdx]">
-                    <p class="schedule-table__subject">{{ schedule[dayIdx][lessonIdx]!.subject }}</p>
-                    <p class="schedule-table__teacher">{{ schedule[dayIdx][lessonIdx]!.teacher }}</p>
-                    <span class="schedule-table__room">каб. {{ schedule[dayIdx][lessonIdx]!.room }}</span>
+                  <template v-if="getLesson(dayIdx, lessonIdx)">
+                    <p class="schedule-table__subject">{{ getLesson(dayIdx, lessonIdx)!.subject }}</p>
+                    <p class="schedule-table__teacher">{{ getLesson(dayIdx, lessonIdx)!.teacher }}</p>
+                    <span class="schedule-table__room">каб. {{ getLesson(dayIdx, lessonIdx)!.room }}</span>
                   </template>
                   <span v-else class="schedule-table__empty">—</span>
                 </td>
@@ -122,7 +123,6 @@ const schedule = computed(() =>
   &:focus { border-color: $navy; }
 }
 
-// Bells
 .bells-card {
   background: $white;
   border: 1px solid $border;
@@ -133,7 +133,7 @@ const schedule = computed(() =>
 
 .bells-card__title {
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   color: $navy;
   margin-bottom: 14px;
 }
@@ -177,7 +177,6 @@ const schedule = computed(() =>
   color: $text-muted;
 }
 
-// Schedule table
 .schedule-title {
   font-size: 18px;
   font-weight: 600;
@@ -251,7 +250,7 @@ const schedule = computed(() =>
 
 .schedule-table__subject {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   color: $text-primary;
   margin-bottom: 2px;
 }

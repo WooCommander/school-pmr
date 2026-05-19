@@ -13,11 +13,11 @@ $text-secondary: #5A6A8A;
 $text-muted:     #8A9BBB;
 
 // === Category accent colors ===
-$cat-events:    #C9A030;  // gold — мероприятия
-$cat-announce:  #185FA5;  // blue — объявления
-$cat-sport:     #2D8A4E;  // green — спорт
-$cat-olympiad:  #7B3EA8;  // purple — олимпиады
-$cat-other:     #8A9BBB;  // muted — прочее
+$cat-events:    #C9A030;
+$cat-announce:  #185FA5;
+$cat-sport:     #2D8A4E;
+$cat-olympiad:  #7B3EA8;
+$cat-other:     #8A9BBB;
 
 // === Typography ===
 $font-base: 'Inter', system-ui, -apple-system, sans-serif;
@@ -29,7 +29,7 @@ $radius-lg:  14px;
 $radius-xl:  20px;
 
 // === Layout ===
-$header-height-desktop: 108px; // topbar(32) + main header(76)
+$header-height-desktop: 108px;
 $header-height-mobile:  52px;
 $max-content-width:     1160px;
 $mobile-breakpoint:     768px;

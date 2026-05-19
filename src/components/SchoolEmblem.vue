@@ -1,11 +1,13 @@
 <script setup lang="ts">
-defineProps<{ size?: string | number }>()
+withDefaults(defineProps<{ size?: string | number }>(), {
+  size: 44,
+})
 </script>
 
 <template>
   <div
     class="emblem"
-    :style="{ width: (size || 44) + 'px', height: (size || 44) + 'px' }"
+    :style="{ width: `${size}px`, height: `${size}px` }"
     aria-hidden="true"
   >
     <span class="emblem__top">SCHOOL</span>
@@ -27,7 +29,6 @@ defineProps<{ size?: string | number }>()
 }
 
 .emblem__top {
-  font-size: calc(v-bind('(+size || 44)') * 0.16px);
   font-size: 7px;
   color: rgba($white, .6);
   letter-spacing: .8px;

@@ -1,46 +1,45 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 import NewsCard from '@/components/NewsCard.vue'
 import { news } from '@/data/news'
+import { useCurrentSchool } from '@/composables/useCurrentSchool'
 
+const route = useRoute()
+const { school } = useCurrentSchool()
 const latestNews = news.slice(0, 4)
 
 const quickLinks = [
-  { name: 'schedule',  label: 'Расписание',  icon: 'calendar' },
-  { name: 'teachers',  label: 'Педагоги',    icon: 'users' },
-  { name: 'documents', label: 'Документы',   icon: 'file' },
-  { name: 'contacts',  label: 'Контакты',    icon: 'phone' },
+  { name: 'school-news', label: 'Новости', icon: 'news' },
+  { name: 'school-schedule', label: 'Расписание', icon: 'calendar' },
+  { name: 'school-teachers', label: 'Педагоги', icon: 'users' },
+  { name: 'school-documents', label: 'Документы', icon: 'file' },
 ]
 
-const stats = [
-  { value: '850', label: 'учеников' },
-  { value: '56',  label: 'педагогов' },
-  { value: '38',  label: 'классов' },
-  { value: '1962', label: 'год основания' },
-]
+function routeFor(name: string) {
+  return { name, params: { slug: route.params.slug } }
+}
 </script>
 
 <template>
   <div>
-    <!-- Hero -->
     <section class="hero">
       <div class="container hero__inner">
         <div class="hero__content">
-          <p class="hero__eyebrow">г. Днестровск, ПМР</p>
+          <p class="hero__eyebrow">{{ school.city }}</p>
           <h1 class="hero__title">
-            МОУ Днестровская<br>средняя школа №1
+            <template v-for="(line, index) in school.heroTitle.split('\n')" :key="index">
+              <span>{{ line }}</span>
+              <br v-if="index < school.heroTitle.split('\n').length - 1">
+            </template>
           </h1>
-          <p class="hero__sub">
-            Качественное образование, развитие личности и подготовка к жизни
-            в современном обществе с&nbsp;1962 года.
-          </p>
+          <p class="hero__sub">{{ school.heroText }}</p>
           <div class="hero__actions">
-            <router-link to="/news" class="btn btn--gold">Актуальные новости</router-link>
-            <router-link to="/contacts" class="btn btn--outline" style="color:#fff;border-color:rgba(255,255,255,.5)">Связаться</router-link>
+            <router-link :to="routeFor('school-news')" class="btn btn--gold">Актуальные новости</router-link>
+            <router-link :to="routeFor('school-contacts')" class="btn btn--outline hero__btn-light">Связаться</router-link>
           </div>
         </div>
         <div class="hero__stats">
-          <div v-for="s in stats" :key="s.label" class="hero__stat">
+          <div v-for="s in school.stats" :key="s.label" class="hero__stat">
             <span class="hero__stat-val">{{ s.value }}</span>
             <span class="hero__stat-label">{{ s.label }}</span>
           </div>
@@ -48,21 +47,20 @@ const stats = [
       </div>
     </section>
 
-    <!-- Quick links -->
     <section class="quick section">
       <div class="container">
         <div class="quick__grid">
           <router-link
             v-for="link in quickLinks"
             :key="link.name"
-            :to="{ name: link.name }"
+            :to="routeFor(link.name)"
             class="quick__item"
           >
             <div class="quick__icon">
-              <svg v-if="link.icon === 'calendar'" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <svg v-if="link.icon === 'news'" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6z"/></svg>
+              <svg v-else-if="link.icon === 'calendar'" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
               <svg v-else-if="link.icon === 'users'" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               <svg v-else-if="link.icon === 'file'" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-              <svg v-else-if="link.icon === 'phone'" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.35 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6.45 6.45l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             </div>
             <span class="quick__label">{{ link.label }}</span>
             <svg class="quick__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
@@ -71,12 +69,11 @@ const stats = [
       </div>
     </section>
 
-    <!-- Latest news -->
-    <section class="section" style="background: $surface; padding-top: 0;">
+    <section class="section section--tight">
       <div class="container">
         <div class="section-header">
           <h2>Последние новости</h2>
-          <router-link to="/news">Все новости →</router-link>
+          <router-link :to="routeFor('school-news')">Все новости →</router-link>
         </div>
         <div class="news-grid">
           <NewsCard v-for="item in latestNews" :key="item.id" :item="item" />
@@ -84,22 +81,20 @@ const stats = [
       </div>
     </section>
 
-    <!-- About band -->
     <section class="about-band">
       <div class="container about-band__inner">
         <div class="about-band__text">
           <h2>О школе</h2>
           <p>
-            МОУ Днестровская средняя школа №1 — ведущее общеобразовательное учреждение
-            города Днестровска. Мы предоставляем качественное образование с&nbsp;1962&nbsp;года,
-            воспитывая всесторонне развитых личностей.
+            {{ school.fullName }} — {{ school.type.toLowerCase() }} в {{ school.city }}.
+            Публичный раздел объединяет новости, документы, педагогический состав,
+            расписание и контактную информацию.
           </p>
           <p>
-            В школе обучаются более 850 учеников под руководством 56 опытных педагогов.
-            Мы гордимся результатами наших учеников на олимпиадах, спортивных
-            соревнованиях и творческих конкурсах.
+            Такой формат позволяет использовать единый современный дизайн для разных школ,
+            сохраняя отдельный вход и отдельную навигацию для каждой из них.
           </p>
-          <router-link to="/contacts" class="btn btn--primary" style="margin-top:8px;display:inline-flex">
+          <router-link :to="routeFor('school-contacts')" class="btn btn--primary" style="margin-top:8px;display:inline-flex">
             Узнать больше
           </router-link>
         </div>
@@ -107,22 +102,22 @@ const stats = [
           <div class="about-band__feature">
             <div class="about-band__feature-icon">🏆</div>
             <div>
-              <p class="about-band__feature-title">Олимпиады</p>
-              <p class="about-band__feature-sub">Призёры районных и республиканских олимпиад</p>
+              <p class="about-band__feature-title">Достижения</p>
+              <p class="about-band__feature-sub">Новости, результаты олимпиад и ключевые события школьной жизни.</p>
             </div>
           </div>
           <div class="about-band__feature">
             <div class="about-band__feature-icon">📚</div>
             <div>
-              <p class="about-band__feature-title">Программы</p>
-              <p class="about-band__feature-sub">Углублённые курсы по математике, физике, химии</p>
+              <p class="about-band__feature-title">Обучение</p>
+              <p class="about-band__feature-sub">Педагоги, расписание и документы в одном публичном контуре.</p>
             </div>
           </div>
           <div class="about-band__feature">
             <div class="about-band__feature-icon">🤝</div>
             <div>
-              <p class="about-band__feature-title">Сообщество</p>
-              <p class="about-band__feature-sub">Активная работа с родителями и выпускниками</p>
+              <p class="about-band__feature-title">Коммуникация</p>
+              <p class="about-band__feature-sub">У родителей и учеников есть отдельная входная точка для каждой школы.</p>
             </div>
           </div>
         </div>
@@ -132,7 +127,6 @@ const stats = [
 </template>
 
 <style lang="scss" scoped>
-// Hero
 .hero {
   background: $navy;
   padding: 64px 0 56px;
@@ -162,6 +156,10 @@ const stats = [
   color: $white;
   line-height: 1.25;
 
+  span {
+    display: inline;
+  }
+
   @media (max-width: $mobile-breakpoint) {
     font-size: 24px;
   }
@@ -184,6 +182,11 @@ const stats = [
   gap: 12px;
   margin-top: 24px;
   flex-wrap: wrap;
+}
+
+.hero__btn-light {
+  color: $white;
+  border-color: rgba($white, .5);
 }
 
 .hero__stats {
@@ -223,7 +226,6 @@ const stats = [
   margin-top: 4px;
 }
 
-// Quick links
 .quick__grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -277,14 +279,16 @@ const stats = [
   flex-shrink: 0;
 }
 
-// News grid
+.section--tight {
+  padding-top: 0;
+}
+
 .news-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 16px;
 }
 
-// About band
 .about-band {
   background: $surface-2;
   padding: 56px 0;

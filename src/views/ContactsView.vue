@@ -1,15 +1,19 @@
 <script setup lang="ts">
-const contacts = [
-  { icon: 'phone',   label: 'Телефон',          value: '+373 555 12-34',                  href: 'tel:+37355512345' },
-  { icon: 'phone',   label: 'Секретариат',       value: '+373 555 56-78',                  href: 'tel:+37355556789' },
-  { icon: 'mail',    label: 'Электронная почта', value: 'info@school1-dnestrovsk.ru',      href: 'mailto:info@school1-dnestrovsk.ru' },
-  { icon: 'map-pin', label: 'Адрес',             value: 'г. Днестровск, ул. Ленина, 1',   href: null },
-  { icon: 'clock',   label: 'Режим работы',      value: 'Пн–Пт: 8:00–17:00',             href: null },
-]
+import { computed } from 'vue'
+import { useCurrentSchool } from '@/composables/useCurrentSchool'
+
+const { school } = useCurrentSchool()
+
+const contacts = computed(() => [
+  { icon: 'phone', label: 'Телефон', value: school.value.phone, href: `tel:${school.value.phone.replace(/[^+\d]/g, '')}` },
+  { icon: 'mail', label: 'Электронная почта', value: school.value.email, href: `mailto:${school.value.email}` },
+  { icon: 'map-pin', label: 'Адрес', value: school.value.address, href: null },
+  { icon: 'clock', label: 'Режим работы', value: school.value.hours, href: null },
+])
 
 const administration = [
-  { role: 'Директор',                            name: 'Иванова Светлана Николаевна',  email: 'director@school1-dnestrovsk.ru' },
-  { role: 'Зам. директора по учебной работе',    name: 'Петров Андрей Викторович',     email: 'zavuch@school1-dnestrovsk.ru' },
+  { role: 'Директор', name: 'Иванова Светлана Николаевна', email: 'director@school1-dnestrovsk.ru' },
+  { role: 'Зам. директора по учебной работе', name: 'Петров Андрей Викторович', email: 'zavuch@school1-dnestrovsk.ru' },
   { role: 'Зам. директора по воспитательной работе', name: 'Фёдорова Людмила Борисовна', email: null },
 ]
 </script>
@@ -18,9 +22,9 @@ const administration = [
   <div class="section">
     <div class="container">
       <h1 class="page-title">Контакты</h1>
+      <p class="page-subtitle">Контактная информация и администрация {{ school.fullName }}</p>
 
       <div class="contacts-layout">
-        <!-- contact cards -->
         <div class="contact-cards">
           <a
             v-for="c in contacts"
@@ -42,17 +46,15 @@ const administration = [
           </a>
         </div>
 
-        <!-- map placeholder -->
         <div class="map-placeholder">
           <div class="map-placeholder__inner">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: #0F2A5E; opacity:.4" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <p>г. Днестровск, ул. Ленина, 1</p>
+            <p>{{ school.address }}</p>
             <p style="font-size:12px;opacity:.6">Карта откроется при интеграции с Яндекс.Картами</p>
           </div>
         </div>
       </div>
 
-      <!-- Administration -->
       <h2 class="admin-title">Администрация</h2>
       <div class="admin-grid">
         <div v-for="a in administration" :key="a.name" class="admin-card">
@@ -145,7 +147,6 @@ const administration = [
   p { font-size: 14px; }
 }
 
-// Administration
 .admin-title {
   font-size: 20px;
   font-weight: 600;

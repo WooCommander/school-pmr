@@ -12,6 +12,7 @@ export interface ScheduleLesson {
 }
 
 export type DaySchedule = (ScheduleLesson | null)[]
+export type WeekSchedule = DaySchedule[]
 
 export const bells: BellItem[] = [
   { number: 1, start: '8:00', end: '8:45' },
@@ -25,7 +26,7 @@ export const bells: BellItem[] = [
 
 export const weekDays = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница']
 
-export const sampleSchedule: Record<string, DaySchedule> = {
+export const sampleSchedule: Record<string, WeekSchedule> = {
   '5А': [
     [
       { subject: 'Математика', teacher: 'Сергеева О.И.', room: '201' },
