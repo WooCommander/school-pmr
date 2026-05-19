@@ -5,12 +5,19 @@ import {
   getTemplatePresetByKey,
   templatePresets,
 } from '@/modules/admin/data/template-presets'
+import {
+  type ThemeKey,
+  getThemePresetByKey,
+  themePresets,
+} from '@/modules/admin/data/theme-presets'
 
 const STORAGE_KEY = 'school-pmr-admin-school-design'
 
 export interface SchoolDesignDraft {
   publishedTemplateKey: TemplateKey
   draftTemplateKey: TemplateKey
+  publishedThemeKey: ThemeKey
+  draftThemeKey: ThemeKey
 }
 
 type SchoolDesignMap = Record<string, SchoolDesignDraft>
@@ -32,11 +39,23 @@ function resolveDefaultTemplateKey(schoolSlug: string): TemplateKey {
 
 function makeDefaultDraft(schoolSlug: string): SchoolDesignDraft {
   const defaultKey = resolveDefaultTemplateKey(schoolSlug)
+  const defaultThemeKey = resolveDefaultThemeKey(schoolSlug)
 
   return {
     publishedTemplateKey: defaultKey,
     draftTemplateKey: defaultKey,
+    publishedThemeKey: defaultThemeKey,
+    draftThemeKey: defaultThemeKey,
   }
+}
+
+function resolveDefaultThemeKey(schoolSlug: string): ThemeKey {
+  const school = findSchoolBySlug(schoolSlug)
+
+  if (!school) return 'blue'
+
+  const index = school.id % themePresets.length
+  return themePresets[index]?.key ?? 'blue'
 }
 
 function loadState() {
@@ -87,6 +106,24 @@ export function publishSchoolDraftTemplate(schoolSlug: string) {
   persistState()
 }
 
+export function updateSchoolDraftTheme(schoolSlug: string, themeKey: ThemeKey) {
+  ensureSchoolDesignDraft(schoolSlug)
+  state.drafts[schoolSlug].draftThemeKey = themeKey
+  persistState()
+}
+
+export function resetSchoolDraftTheme(schoolSlug: string) {
+  ensureSchoolDesignDraft(schoolSlug)
+  state.drafts[schoolSlug].draftThemeKey = state.drafts[schoolSlug].publishedThemeKey
+  persistState()
+}
+
+export function publishSchoolDraftTheme(schoolSlug: string) {
+  ensureSchoolDesignDraft(schoolSlug)
+  state.drafts[schoolSlug].publishedThemeKey = state.drafts[schoolSlug].draftThemeKey
+  persistState()
+}
+
 export function useSchoolDesignDraft(schoolSlug: string) {
   ensureSchoolDesignDraft(schoolSlug)
 
@@ -97,10 +134,18 @@ export function useSchoolDesignDraft(schoolSlug: string) {
   const selectedTemplate = computed(() =>
     getTemplatePresetByKey(draft.value.draftTemplateKey)
   )
+  const publishedTheme = computed(() =>
+    getThemePresetByKey(draft.value.publishedThemeKey)
+  )
+  const selectedTheme = computed(() =>
+    getThemePresetByKey(draft.value.draftThemeKey)
+  )
 
   return {
     designDraft: draft,
     publishedTemplate,
     selectedTemplate,
+    publishedTheme,
+    selectedTheme,
   }
 }
