@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { adminRoutes } from '@/modules/admin/router/admin-routes'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -63,5 +64,6 @@ export const router = createRouter({
         },
       ],
     },
+    ...adminRoutes,
   ],
 })
