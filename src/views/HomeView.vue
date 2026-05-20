@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import NewsCard from '@/components/NewsCard.vue'
 import SchoolEmblem from '@/components/SchoolEmblem.vue'
 import { useCurrentSchool } from '@/composables/useCurrentSchool'
+import { getPublishedSchoolHomeBlocks } from '@/modules/admin/state/school-home-blocks'
 import { getPublishedSchoolNews } from '@/modules/admin/state/school-news'
 
 const route = useRoute()
@@ -14,6 +15,9 @@ const schoolSlug = computed(() =>
 )
 
 const latestNews = computed(() => getPublishedSchoolNews(schoolSlug.value).slice(0, 4))
+const homeBlocks = computed(() =>
+  getPublishedSchoolHomeBlocks(schoolSlug.value).filter((item) => item.visible),
+)
 
 const quickLinks = [
   { name: 'school-news', label: 'Новости', icon: 'news' },
@@ -50,227 +54,236 @@ function featureIcon(icon: string) {
 
 <template>
   <div>
-    <section class="hero">
-      <div class="container hero__inner">
-        <div class="hero__copy">
-          <p class="hero__eyebrow">{{ school.city }}</p>
+    <template v-for="block in homeBlocks" :key="block.key">
+      <section v-if="block.key === 'hero'" class="hero">
+        <div class="container hero__inner">
+          <div class="hero__copy">
+            <p class="hero__eyebrow">{{ school.city }}</p>
 
-          <h1 class="hero__title">
-            <template v-for="(line, index) in school.heroTitle.split('\n')" :key="index">
-              <span>{{ line }}</span>
-              <br v-if="index < school.heroTitle.split('\n').length - 1">
-            </template>
-          </h1>
+            <h1 class="hero__title">
+              <template v-for="(line, index) in school.heroTitle.split('\n')" :key="index">
+                <span>{{ line }}</span>
+                <br v-if="index < school.heroTitle.split('\n').length - 1">
+              </template>
+            </h1>
 
-          <p class="hero__sub">{{ school.heroText }}</p>
+            <p class="hero__sub">{{ school.heroText }}</p>
 
-          <div class="hero__actions">
-            <router-link :to="routeFor('school-news')" class="btn btn--gold">
-              Актуальные новости
+            <div class="hero__actions">
+              <router-link :to="routeFor('school-news')" class="btn btn--gold">
+                Актуальные новости
+              </router-link>
+              <router-link
+                :to="routeFor('school-contacts')"
+                class="btn btn--outline hero__btn-light"
+              >
+                Связаться
+              </router-link>
+            </div>
+          </div>
+
+          <div class="hero__panel">
+            <div class="hero-card">
+              <div class="hero-card__brand">
+                <SchoolEmblem size="54" />
+
+                <div>
+                  <p class="hero-card__short">{{ school.shortName }}</p>
+                  <p class="hero-card__full">{{ school.fullName }}</p>
+                </div>
+              </div>
+
+              <div class="hero-card__highlights">
+                <div
+                  v-for="item in schoolHighlights"
+                  :key="item.label"
+                  class="hero-card__highlight"
+                >
+                  <span>{{ item.label }}</span>
+                  <strong>{{ item.value }}</strong>
+                </div>
+              </div>
+
+              <router-link :to="routeFor('school-contacts')" class="hero-card__link">
+                Контакты и администрация
+              </router-link>
+            </div>
+          </div>
+
+          <div class="hero__stats">
+            <div v-for="s in school.stats" :key="s.label" class="hero__stat">
+              <span class="hero__stat-val">{{ s.value }}</span>
+              <span class="hero__stat-label">{{ s.label }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section v-else-if="block.key === 'quick-links'" class="quick section">
+        <div class="container">
+          <div class="quick__grid">
+            <router-link
+              v-for="link in quickLinks"
+              :key="link.name"
+              :to="routeFor(link.name)"
+              class="quick__item"
+            >
+              <div class="quick__icon">
+                <svg
+                  v-if="link.icon === 'news'"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"
+                  />
+                  <path d="M18 14h-8" />
+                  <path d="M15 18h-5" />
+                  <path d="M10 6h8v4h-8V6z" />
+                </svg>
+                <svg
+                  v-else-if="link.icon === 'calendar'"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+                <svg
+                  v-else-if="link.icon === 'users'"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                <svg
+                  v-else-if="link.icon === 'file'"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                  <polyline points="10 9 9 9 8 9" />
+                </svg>
+              </div>
+              <span class="quick__label">{{ link.label }}</span>
+              <svg
+                class="quick__arrow"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
             </router-link>
+          </div>
+        </div>
+      </section>
+
+      <section v-else-if="block.key === 'news'" class="section section--tight">
+        <div class="container">
+          <div class="section-header">
+            <h2>Последние новости</h2>
+            <router-link :to="routeFor('school-news')">Все новости →</router-link>
+          </div>
+          <div class="news-grid">
+            <NewsCard v-for="item in latestNews" :key="item.id" :item="item" />
+          </div>
+        </div>
+      </section>
+
+      <section v-else-if="block.key === 'about'" class="about-band">
+        <div class="container about-band__inner">
+          <div class="about-band__text">
+            <h2>О школе</h2>
+            <p>
+              {{ school.fullName }} — {{ school.type.toLowerCase() }} в {{ school.city }}.
+            </p>
+            <p>
+              Публичный раздел объединяет новости, документы, педагогический состав,
+              расписание и контактную информацию.
+            </p>
             <router-link
               :to="routeFor('school-contacts')"
-              class="btn btn--outline hero__btn-light"
+              class="btn btn--primary about-band__cta"
             >
-              Связаться
+              Узнать больше
             </router-link>
           </div>
-        </div>
 
-        <div class="hero__panel">
-          <div class="hero-card">
-            <div class="hero-card__brand">
-              <SchoolEmblem size="54" />
-
+          <div class="about-band__features">
+            <div class="about-band__feature">
+              <div class="about-band__feature-icon">{{ featureIcon('award') }}</div>
               <div>
-                <p class="hero-card__short">{{ school.shortName }}</p>
-                <p class="hero-card__full">{{ school.fullName }}</p>
+                <p class="about-band__feature-title">Достижения</p>
+                <p class="about-band__feature-sub">
+                  Новости, результаты олимпиад и ключевые события школьной жизни.
+                </p>
               </div>
             </div>
-
-            <div class="hero-card__highlights">
-              <div v-for="item in schoolHighlights" :key="item.label" class="hero-card__highlight">
-                <span>{{ item.label }}</span>
-                <strong>{{ item.value }}</strong>
+            <div class="about-band__feature">
+              <div class="about-band__feature-icon">{{ featureIcon('book') }}</div>
+              <div>
+                <p class="about-band__feature-title">Обучение</p>
+                <p class="about-band__feature-sub">
+                  Педагоги, расписание и документы в одном публичном контуре.
+                </p>
               </div>
             </div>
-
-            <router-link :to="routeFor('school-contacts')" class="hero-card__link">
-              Контакты и администрация
-            </router-link>
-          </div>
-        </div>
-
-        <div class="hero__stats">
-          <div v-for="s in school.stats" :key="s.label" class="hero__stat">
-            <span class="hero__stat-val">{{ s.value }}</span>
-            <span class="hero__stat-label">{{ s.label }}</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="quick section">
-      <div class="container">
-        <div class="quick__grid">
-          <router-link
-            v-for="link in quickLinks"
-            :key="link.name"
-            :to="routeFor(link.name)"
-            class="quick__item"
-          >
-            <div class="quick__icon">
-              <svg
-                v-if="link.icon === 'news'"
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path
-                  d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"
-                />
-                <path d="M18 14h-8" />
-                <path d="M15 18h-5" />
-                <path d="M10 6h8v4h-8V6z" />
-              </svg>
-              <svg
-                v-else-if="link.icon === 'calendar'"
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <rect x="3" y="4" width="18" height="18" rx="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-              <svg
-                v-else-if="link.icon === 'users'"
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
-              <svg
-                v-else-if="link.icon === 'file'"
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-                <polyline points="10 9 9 9 8 9" />
-              </svg>
-            </div>
-            <span class="quick__label">{{ link.label }}</span>
-            <svg
-              class="quick__arrow"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </router-link>
-        </div>
-      </div>
-    </section>
-
-    <section class="section section--tight">
-      <div class="container">
-        <div class="section-header">
-          <h2>Последние новости</h2>
-          <router-link :to="routeFor('school-news')">Все новости →</router-link>
-        </div>
-        <div class="news-grid">
-          <NewsCard v-for="item in latestNews" :key="item.id" :item="item" />
-        </div>
-      </div>
-    </section>
-
-    <section class="about-band">
-      <div class="container about-band__inner">
-        <div class="about-band__text">
-          <h2>О школе</h2>
-          <p>
-            {{ school.fullName }} — {{ school.type.toLowerCase() }} в {{ school.city }}.
-          </p>
-          <p>
-            Публичный раздел объединяет новости, документы, педагогический состав,
-            расписание и контактную информацию.
-          </p>
-          <router-link :to="routeFor('school-contacts')" class="btn btn--primary about-band__cta">
-            Узнать больше
-          </router-link>
-        </div>
-
-        <div class="about-band__features">
-          <div class="about-band__feature">
-            <div class="about-band__feature-icon">{{ featureIcon('award') }}</div>
-            <div>
-              <p class="about-band__feature-title">Достижения</p>
-              <p class="about-band__feature-sub">
-                Новости, результаты олимпиад и ключевые события школьной жизни.
-              </p>
-            </div>
-          </div>
-          <div class="about-band__feature">
-            <div class="about-band__feature-icon">{{ featureIcon('book') }}</div>
-            <div>
-              <p class="about-band__feature-title">Обучение</p>
-              <p class="about-band__feature-sub">
-                Педагоги, расписание и документы в одном публичном контуре.
-              </p>
-            </div>
-          </div>
-          <div class="about-band__feature">
-            <div class="about-band__feature-icon">{{ featureIcon('chat') }}</div>
-            <div>
-              <p class="about-band__feature-title">Коммуникация</p>
-              <p class="about-band__feature-sub">
-                Понятная точка входа для родителей, учеников и гостей школы.
-              </p>
+            <div class="about-band__feature">
+              <div class="about-band__feature-icon">{{ featureIcon('chat') }}</div>
+              <div>
+                <p class="about-band__feature-title">Коммуникация</p>
+                <p class="about-band__feature-sub">
+                  Понятная точка входа для родителей, учеников и гостей школы.
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </template>
   </div>
 </template>
 
@@ -375,16 +388,6 @@ function featureIcon(icon: string) {
   display: flex;
   align-items: flex-start;
   gap: 16px;
-}
-
-.hero-card__logo {
-  width: 54px;
-  height: 54px;
-  object-fit: cover;
-  border-radius: 14px;
-  background: rgba($white, .94);
-  border: 1px solid rgba($white, .25);
-  flex-shrink: 0;
 }
 
 .hero-card__short {
