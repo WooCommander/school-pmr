@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import SchoolEmblem from '@/components/SchoolEmblem.vue'
 import { useCurrentSchool } from '@/composables/useCurrentSchool'
+import { isSchoolModuleEnabled } from '@/modules/admin/state/school-modules'
+import { getPublishedSchoolNavigation } from '@/modules/admin/state/school-navigation'
 
 const route = useRoute()
 const { school } = useCurrentSchool()
@@ -16,23 +18,27 @@ function handleScroll() {
 onMounted(() => window.addEventListener('scroll', handleScroll))
 onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 
-const navLinks = [
-  { name: 'school-home', label: 'Главная' },
-  { name: 'school-news', label: 'Новости' },
-  { name: 'school-teachers', label: 'Педагоги' },
-  { name: 'school-schedule', label: 'Расписание' },
-  { name: 'school-gallery', label: 'Галерея' },
-  { name: 'school-documents', label: 'Документы' },
-  { name: 'school-contacts', label: 'Контакты' },
-]
+const navLinks = computed(() =>
+  getPublishedSchoolNavigation(school.value.slug)
+    .filter((item) => item.visible)
+    .filter((item) => item.key === 'home' || isSchoolModuleEnabled(school.value.slug, item.key))
+    .map((item) => ({
+      name: item.routeName,
+      label: item.label,
+    }))
+)
 
-const mobileNavLinks = [
-  { name: 'school-home', label: 'Главная', icon: 'home' },
-  { name: 'school-news', label: 'Новости', icon: 'news' },
-  { name: 'school-schedule', label: 'Расписание', icon: 'calendar' },
-  { name: 'school-gallery', label: 'Галерея', icon: 'image' },
-  { name: 'school-contacts', label: 'Контакты', icon: 'phone' },
-]
+const mobileNavLinks = computed(() =>
+  getPublishedSchoolNavigation(school.value.slug)
+    .filter((item) => item.visible)
+    .filter((item) => item.key === 'home' || isSchoolModuleEnabled(school.value.slug, item.key))
+    .slice(0, 5)
+    .map((item) => ({
+      name: item.routeName,
+      label: item.label,
+      icon: item.mobileIcon,
+    }))
+)
 
 const currentRouteName = computed(() => route.name)
 
@@ -45,7 +51,7 @@ function routeFor(name: string) {
   <header class="header" :class="{ 'header--scrolled': scrolled }">
     <div class="header__topbar">
       <div class="container header__topbar-inner">
-        <a :href="`tel:${school.phone.replace(/[^+\d]/g, '')}`" class="header__topbar-item">
+        <a :href="`tel:${school.phone.replace(/[^+\\d]/g, '')}`" class="header__topbar-item">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.35 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6.45 6.45l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
           {{ school.phone }}
         </a>
@@ -120,11 +126,7 @@ function routeFor(name: string) {
   </Transition>
 
   <Transition name="fade">
-    <div
-      v-if="mobileMenuOpen"
-      class="overlay"
-      @click="mobileMenuOpen = false"
-    />
+    <div v-if="mobileMenuOpen" class="overlay" @click="mobileMenuOpen = false" />
   </Transition>
 
   <main class="page-content">
@@ -166,6 +168,8 @@ function routeFor(name: string) {
       <svg v-else-if="link.icon === 'calendar'" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       <svg v-else-if="link.icon === 'image'" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
       <svg v-else-if="link.icon === 'phone'" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.35 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6.45 6.45l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <svg v-else-if="link.icon === 'users'" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <svg v-else-if="link.icon === 'file'" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
       <span class="bottom-nav__label">{{ link.label }}</span>
     </router-link>
   </nav>
@@ -190,7 +194,9 @@ function routeFor(name: string) {
 .header__topbar {
   background: $navy;
 
-  @media (max-width: $mobile-breakpoint) { display: none; }
+  @media (max-width: $mobile-breakpoint) {
+    display: none;
+  }
 }
 
 .header__topbar-inner {
@@ -209,10 +215,17 @@ function routeFor(name: string) {
   text-decoration: none;
   transition: color $transition-fast;
 
-  &:hover { color: $white; }
-  &--right { margin-left: auto; }
+  &:hover {
+    color: $white;
+  }
 
-  svg { flex-shrink: 0; }
+  &--right {
+    margin-left: auto;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
 }
 
 .header__main {
@@ -269,7 +282,9 @@ function routeFor(name: string) {
   justify-content: center;
   gap: 0;
 
-  @media (max-width: $mobile-breakpoint) { display: none; }
+  @media (max-width: $mobile-breakpoint) {
+    display: none;
+  }
 }
 
 .header__nav-link {
@@ -283,7 +298,9 @@ function routeFor(name: string) {
   transition: border-color $transition-fast, color $transition-fast;
   font-weight: 400;
 
-  &:hover { border-bottom-color: rgba($navy, .25); }
+  &:hover {
+    border-bottom-color: rgba($navy, .25);
+  }
 
   &--active {
     border-bottom-color: $gold;
@@ -305,9 +322,13 @@ function routeFor(name: string) {
   transition: background $transition-fast;
   margin-left: auto;
 
-  &:hover { background: rgba($navy, .06); }
+  &:hover {
+    background: rgba($navy, .06);
+  }
 
-  @media (max-width: $mobile-breakpoint) { display: flex; }
+  @media (max-width: $mobile-breakpoint) {
+    display: flex;
+  }
 }
 
 .mobile-drawer {
@@ -320,7 +341,9 @@ function routeFor(name: string) {
   border-bottom: 1px solid $border;
   padding: 8px 0;
 
-  @media (min-width: calc(#{$mobile-breakpoint} + 1px)) { display: none; }
+  @media (min-width: calc(#{$mobile-breakpoint} + 1px)) {
+    display: none;
+  }
 }
 
 .mobile-drawer__link {
@@ -332,7 +355,9 @@ function routeFor(name: string) {
   border-left: 3px solid transparent;
   transition: all $transition-fast;
 
-  &:hover { background: $surface; }
+  &:hover {
+    background: $surface;
+  }
 
   &--active {
     border-left-color: $gold;
@@ -348,7 +373,9 @@ function routeFor(name: string) {
   background: rgba($navy, .3);
   z-index: 98;
 
-  @media (min-width: calc(#{$mobile-breakpoint} + 1px)) { display: none; }
+  @media (min-width: calc(#{$mobile-breakpoint} + 1px)) {
+    display: none;
+  }
 }
 
 .footer {
@@ -396,7 +423,9 @@ function routeFor(name: string) {
     text-decoration: none;
     transition: color $transition-fast;
 
-    &:hover { color: $white; }
+    &:hover {
+      color: $white;
+    }
   }
 }
 
@@ -452,7 +481,9 @@ function routeFor(name: string) {
     }
   }
 
-  svg { flex-shrink: 0; }
+  svg {
+    flex-shrink: 0;
+  }
 }
 
 .bottom-nav__label {
@@ -472,12 +503,28 @@ function routeFor(name: string) {
   opacity: 0;
 }
 
-.fade-enter-active, .fade-leave-active { transition: opacity $transition-base; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity $transition-base;
+}
 
-.page-enter-active, .page-leave-active {
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.page-enter-active,
+.page-leave-active {
   transition: opacity .18s ease, transform .18s ease;
 }
-.page-enter-from { opacity: 0; transform: translateY(6px); }
-.page-leave-to   { opacity: 0; transform: translateY(-4px); }
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
 </style>

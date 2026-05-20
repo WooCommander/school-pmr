@@ -1,6 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { adminRoutes } from '@/modules/admin/router/admin-routes'
 import { hasAdminAccessToSchool, useAdminAuth } from '@/modules/admin/state/admin-auth'
+import { isSchoolModuleEnabled, type SchoolModuleKey } from '@/modules/admin/state/school-modules'
+
+const schoolRouteModuleMap: Partial<Record<string, SchoolModuleKey>> = {
+  'school-news': 'news',
+  'school-news-detail': 'news',
+  'school-teachers': 'teachers',
+  'school-schedule': 'schedule',
+  'school-gallery': 'gallery',
+  'school-documents': 'documents',
+  'school-contacts': 'contacts',
+}
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -75,6 +86,8 @@ router.beforeEach((to) => {
   const guestOnly = !!to.meta.guestOnly
   const needsSchoolAccess = !!to.meta.requiresSchoolAccess
   const schoolSlug = typeof to.params.slug === 'string' ? to.params.slug : null
+  const routeName = typeof to.name === 'string' ? to.name : null
+  const schoolModule = routeName ? schoolRouteModuleMap[routeName] : null
 
   if (guestOnly && isAuthenticated.value) {
     if (state.selectedSchoolSlug) {
@@ -94,6 +107,10 @@ router.beforeEach((to) => {
     }
 
     return { name: 'admin-select-school' }
+  }
+
+  if (schoolSlug && schoolModule && !isSchoolModuleEnabled(schoolSlug, schoolModule)) {
+    return { name: 'school-home', params: { slug: schoolSlug } }
   }
 
   return true
