@@ -4,6 +4,7 @@ import {
   type SchoolGeneralDraft,
   peekSchoolSettingsDraft,
 } from '@/modules/admin/state/school-settings'
+import { getTeachersBySchool } from '@/data/teachers'
 import {
   getDefaultSchoolSlugService,
   getSchoolBySlugService,
@@ -47,6 +48,19 @@ function applyDerivedContent(school: SchoolProfile, general?: SchoolGeneralDraft
   }
 }
 
+function applyDerivedStats(school: SchoolProfile): SchoolProfile {
+  const teacherCount = getTeachersBySchool(school.slug).length
+
+  return {
+    ...school,
+    stats: school.stats.map((item) =>
+      item.label.toLowerCase() === 'педагогов'
+        ? { ...item, value: String(teacherCount) }
+        : item,
+    ),
+  }
+}
+
 export function getManagedSchoolBySlug(schoolSlug: string): SchoolProfile | null {
   const school = getSchoolBySlugService(schoolSlug)
   if (!school) return null
@@ -54,8 +68,9 @@ export function getManagedSchoolBySlug(schoolSlug: string): SchoolProfile | null
   const settingsDraft = peekSchoolSettingsDraft(schoolSlug)
   const withGeneral = applyGeneralDraft(school, settingsDraft?.general)
   const withContacts = applyContactsDraft(withGeneral, settingsDraft?.contacts)
+  const withDerivedContent = applyDerivedContent(withContacts, settingsDraft?.general)
 
-  return applyDerivedContent(withContacts, settingsDraft?.general)
+  return applyDerivedStats(withDerivedContent)
 }
 
 export function getManagedSchools(): SchoolProfile[] {
