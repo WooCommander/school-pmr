@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { getTeachersBySchool } from '@/data/teachers'
 import { useCurrentSchool } from '@/composables/useCurrentSchool'
 
@@ -9,11 +9,11 @@ const search = ref('')
 const schoolTeachers = computed(() => getTeachersBySchool(school.value.slug))
 
 const filtered = computed(() => {
-  const q = search.value.toLowerCase()
-  if (!q) return schoolTeachers.value
-  return schoolTeachers.value.filter(t =>
-    t.name.toLowerCase().includes(q) ||
-    t.subject.toLowerCase().includes(q)
+  const query = search.value.toLowerCase()
+  if (!query) return schoolTeachers.value
+  return schoolTeachers.value.filter((teacher) =>
+    teacher.name.toLowerCase().includes(query) ||
+    teacher.subject.toLowerCase().includes(query),
   )
 })
 
@@ -21,17 +21,21 @@ function initials(name: string) {
   return name
     .split(' ')
     .slice(0, 2)
-    .map(w => w[0])
+    .map((part) => part[0])
     .join('')
 }
 
-const avatarColors = [
-  '#0F2A5E', '#185FA5', '#3B6D11', '#7B3EA8',
-  '#C9A030', '#2D8A4E', '#993556', '#555',
-]
-
 function avatarColor(id: number) {
-  return avatarColors[id % avatarColors.length]
+  const colors = [
+    'var(--school-primary)',
+    'var(--school-secondary)',
+    '#3B6D11',
+    '#7B3EA8',
+    '#C9A030',
+    '#2D8A4E',
+  ]
+
+  return colors[id % colors.length]
 }
 </script>
 
@@ -54,27 +58,27 @@ function avatarColor(id: number) {
 
       <div class="teachers-grid">
         <div
-          v-for="t in filtered"
-          :key="t.id"
+          v-for="teacher in filtered"
+          :key="teacher.id"
           class="teacher-card"
         >
           <div
             class="teacher-card__avatar"
-            :style="{ background: avatarColor(t.id) }"
+            :style="{ background: avatarColor(teacher.id) }"
             aria-hidden="true"
           >
-            {{ initials(t.name) }}
+            {{ initials(teacher.name) }}
           </div>
           <div class="teacher-card__body">
-            <p class="teacher-card__name">{{ t.name }}</p>
-            <p class="teacher-card__position">{{ t.position }}</p>
+            <p class="teacher-card__name">{{ teacher.name }}</p>
+            <p class="teacher-card__position">{{ teacher.position }}</p>
             <div class="teacher-card__meta">
-              <span class="teacher-card__subject">{{ t.subject }}</span>
-              <span class="teacher-card__category">{{ t.category }} категория</span>
+              <span class="teacher-card__subject">{{ teacher.subject }}</span>
+              <span class="teacher-card__category">{{ teacher.category }} категория</span>
             </div>
-            <p class="teacher-card__exp">Стаж: {{ t.experience }} лет</p>
-            <a v-if="t.email" :href="`mailto:${t.email}`" class="teacher-card__email">
-              {{ t.email }}
+            <p class="teacher-card__exp">Стаж: {{ teacher.experience }} лет</p>
+            <a v-if="teacher.email" :href="`mailto:${teacher.email}`" class="teacher-card__email">
+              {{ teacher.email }}
             </a>
           </div>
         </div>
@@ -105,7 +109,7 @@ function avatarColor(id: number) {
 .search-input {
   width: 100%;
   padding: 10px 14px 10px 38px;
-  border: 1px solid $border;
+  border: 1px solid var(--school-card-border);
   border-radius: $radius-md;
   font-size: 14px;
   font-family: inherit;
@@ -114,7 +118,7 @@ function avatarColor(id: number) {
   outline: none;
   transition: border-color $transition-fast;
 
-  &:focus { border-color: $navy; }
+  &:focus { border-color: var(--school-primary); }
   &::placeholder { color: $text-muted; }
 }
 
@@ -132,13 +136,13 @@ function avatarColor(id: number) {
   display: flex;
   gap: 14px;
   background: $white;
-  border: 1px solid $border;
-  border-radius: $radius-lg;
+  border: 1px solid var(--school-card-border);
+  border-radius: var(--school-card-radius);
   padding: 18px;
   align-items: flex-start;
   transition: box-shadow $transition-base;
 
-  &:hover { box-shadow: 0 4px 16px rgba($navy, .08); }
+  &:hover { box-shadow: 0 4px 16px color-mix(in srgb, var(--school-primary) 8%, transparent); }
 }
 
 .teacher-card__avatar {
@@ -183,8 +187,8 @@ function avatarColor(id: number) {
 
 .teacher-card__subject {
   font-size: 11px;
-  background: rgba($navy, .08);
-  color: $navy;
+  background: color-mix(in srgb, var(--school-primary) 8%, white);
+  color: var(--school-primary);
   padding: 2px 8px;
   border-radius: 12px;
   font-weight: 500;
@@ -192,7 +196,7 @@ function avatarColor(id: number) {
 
 .teacher-card__category {
   font-size: 11px;
-  background: rgba($gold, .12);
+  background: color-mix(in srgb, var(--school-accent) 16%, white);
   color: #7d5631;
   padding: 2px 8px;
   border-radius: 12px;
@@ -206,7 +210,7 @@ function avatarColor(id: number) {
 
 .teacher-card__email {
   font-size: 12px;
-  color: $navy;
+  color: var(--school-primary);
   text-decoration: none;
   word-break: break-all;
 

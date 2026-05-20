@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { bells, sampleSchedule, classGroups, weekDays } from '@/data/schedule'
 import { useCurrentSchool } from '@/composables/useCurrentSchool'
 
@@ -7,7 +7,7 @@ const { school } = useCurrentSchool()
 const selectedClass = ref('5А')
 
 const schedule = computed(() =>
-  sampleSchedule[selectedClass.value] ?? null
+  sampleSchedule[selectedClass.value] ?? null,
 )
 
 function getLesson(dayIdx: number, lessonIdx: number) {
@@ -29,7 +29,7 @@ function getLesson(dayIdx: number, lessonIdx: number) {
             v-model="selectedClass"
             class="class-select"
           >
-            <option v-for="cls in classGroups" :key="cls" :value="cls">{{ cls }}</option>
+            <option v-for="className in classGroups" :key="className" :value="className">{{ className }}</option>
           </select>
         </div>
       </div>
@@ -113,7 +113,7 @@ function getLesson(dayIdx: number, lessonIdx: number) {
 .class-select {
   appearance: none;
   padding: 9px 36px 9px 14px;
-  border: 1px solid $border;
+  border: 1px solid var(--school-card-border);
   border-radius: $radius-md;
   font-size: 14px;
   font-family: inherit;
@@ -123,13 +123,13 @@ function getLesson(dayIdx: number, lessonIdx: number) {
   outline: none;
   transition: border-color $transition-fast;
 
-  &:focus { border-color: $navy; }
+  &:focus { border-color: var(--school-primary); }
 }
 
 .bells-card {
   background: $white;
-  border: 1px solid $border;
-  border-radius: $radius-lg;
+  border: 1px solid var(--school-card-border);
+  border-radius: var(--school-card-radius);
   padding: 20px 24px;
   margin-bottom: 28px;
 }
@@ -137,7 +137,7 @@ function getLesson(dayIdx: number, lessonIdx: number) {
 .bells-card__title {
   font-size: 15px;
   font-weight: 600;
-  color: $navy;
+  color: var(--school-primary);
   margin-bottom: 14px;
 }
 
@@ -152,14 +152,14 @@ function getLesson(dayIdx: number, lessonIdx: number) {
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  background: $surface;
+  background: var(--school-hero-subtle);
   border-radius: $radius-sm;
 }
 
 .bell-item__num {
   width: 22px;
   height: 22px;
-  background: $navy;
+  background: var(--school-primary);
   color: $white;
   border-radius: 50%;
   display: flex;
@@ -183,14 +183,14 @@ function getLesson(dayIdx: number, lessonIdx: number) {
 .schedule-title {
   font-size: 18px;
   font-weight: 600;
-  color: $navy;
+  color: var(--school-primary);
   margin-bottom: 16px;
 }
 
 .schedule-table-scroll {
   overflow-x: auto;
-  border-radius: $radius-lg;
-  border: 1px solid $border;
+  border-radius: var(--school-card-radius);
+  border: 1px solid var(--school-card-border);
 }
 
 .schedule-table {
@@ -208,18 +208,18 @@ function getLesson(dayIdx: number, lessonIdx: number) {
   font-weight: 500;
   color: $text-secondary;
   text-align: left;
-  background: $surface-2;
-  border-bottom: 2px solid $navy;
+  background: var(--school-hero-subtle);
+  border-bottom: 2px solid var(--school-primary);
 }
 
 .schedule-table__th-day {
   padding: 12px 10px;
   font-size: 13px;
   font-weight: 500;
-  color: $navy;
+  color: var(--school-primary);
   text-align: left;
-  background: $surface-2;
-  border-bottom: 2px solid $navy;
+  background: var(--school-hero-subtle);
+  border-bottom: 2px solid var(--school-primary);
 }
 
 .schedule-table__num {
@@ -233,7 +233,7 @@ function getLesson(dayIdx: number, lessonIdx: number) {
   display: block;
   font-size: 16px;
   font-weight: 600;
-  color: $navy;
+  color: var(--school-primary);
   line-height: 1;
 }
 
@@ -266,8 +266,8 @@ function getLesson(dayIdx: number, lessonIdx: number) {
 
 .schedule-table__room {
   font-size: 10px;
-  background: rgba($navy, .07);
-  color: $navy;
+  background: color-mix(in srgb, var(--school-primary) 7%, white);
+  color: var(--school-primary);
   padding: 1px 6px;
   border-radius: 10px;
 }

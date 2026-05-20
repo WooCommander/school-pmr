@@ -14,7 +14,7 @@ const contacts = computed(() => [
 const administration = [
   { role: 'Директор', name: 'Иванова Светлана Николаевна', email: 'director@school1-dnestrovsk.ru' },
   { role: 'Зам. директора по учебной работе', name: 'Петров Андрей Викторович', email: 'zavuch@school1-dnestrovsk.ru' },
-  { role: 'Зам. директора по воспитательной работе', name: 'Фёдорова Людмила Борисовна', email: null },
+  { role: 'Зам. директора по воспитательной работе', name: 'Федорова Людмила Борисовна', email: null },
 ]
 </script>
 
@@ -27,40 +27,40 @@ const administration = [
       <div class="contacts-layout">
         <div class="contact-cards">
           <a
-            v-for="c in contacts"
-            :key="c.label"
-            :href="c.href ?? undefined"
+            v-for="contact in contacts"
+            :key="contact.label"
+            :href="contact.href ?? undefined"
             class="contact-card"
-            :class="{ 'contact-card--link': !!c.href }"
+            :class="{ 'contact-card--link': !!contact.href }"
           >
             <div class="contact-card__icon">
-              <svg v-if="c.icon === 'phone'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.35 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6.45 6.45l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              <svg v-else-if="c.icon === 'mail'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              <svg v-else-if="c.icon === 'map-pin'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <svg v-else-if="c.icon === 'clock'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <svg v-if="contact.icon === 'phone'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.35 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6.45 6.45l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <svg v-else-if="contact.icon === 'mail'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <svg v-else-if="contact.icon === 'map-pin'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <svg v-else-if="contact.icon === 'clock'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </div>
             <div>
-              <p class="contact-card__label">{{ c.label }}</p>
-              <p class="contact-card__value">{{ c.value }}</p>
+              <p class="contact-card__label">{{ contact.label }}</p>
+              <p class="contact-card__value">{{ contact.value }}</p>
             </div>
           </a>
         </div>
 
         <div class="map-placeholder">
           <div class="map-placeholder__inner">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: #0F2A5E; opacity:.4" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
             <p>{{ school.address }}</p>
-            <p style="font-size:12px;opacity:.6">Карта откроется при интеграции с Яндекс.Картами</p>
+            <p class="map-placeholder__hint">Карта появится после подключения реального map-embed.</p>
           </div>
         </div>
       </div>
 
       <h2 class="admin-title">Администрация</h2>
       <div class="admin-grid">
-        <div v-for="a in administration" :key="a.name" class="admin-card">
-          <div class="admin-card__role">{{ a.role }}</div>
-          <div class="admin-card__name">{{ a.name }}</div>
-          <a v-if="a.email" :href="`mailto:${a.email}`" class="admin-card__email">{{ a.email }}</a>
+        <div v-for="item in administration" :key="item.name" class="admin-card">
+          <div class="admin-card__role">{{ item.role }}</div>
+          <div class="admin-card__name">{{ item.name }}</div>
+          <a v-if="item.email" :href="`mailto:${item.email}`" class="admin-card__email">{{ item.email }}</a>
         </div>
       </div>
     </div>
@@ -90,28 +90,28 @@ const administration = [
   align-items: center;
   gap: 14px;
   background: $white;
-  border: 1px solid $border;
-  border-radius: $radius-lg;
+  border: 1px solid var(--school-card-border);
+  border-radius: var(--school-card-radius);
   padding: 16px 18px;
   text-decoration: none;
   color: $text-primary;
-  transition: box-shadow $transition-fast;
+  transition: box-shadow $transition-fast, color $transition-fast;
 
   &--link:hover {
-    box-shadow: 0 2px 12px rgba($navy, .08);
-    color: $navy;
+    box-shadow: 0 2px 12px color-mix(in srgb, var(--school-primary) 8%, transparent);
+    color: var(--school-primary);
   }
 }
 
 .contact-card__icon {
   width: 44px;
   height: 44px;
-  background: rgba($navy, .07);
+  background: color-mix(in srgb, var(--school-primary) 8%, white);
   border-radius: $radius-md;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $navy;
+  color: var(--school-primary);
   flex-shrink: 0;
 }
 
@@ -127,9 +127,9 @@ const administration = [
 }
 
 .map-placeholder {
-  background: $surface-2;
-  border: 1px solid $border;
-  border-radius: $radius-lg;
+  background: var(--school-hero-subtle);
+  border: 1px solid var(--school-card-border);
+  border-radius: var(--school-card-radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -144,13 +144,25 @@ const administration = [
   align-items: center;
   gap: 8px;
 
-  p { font-size: 14px; }
+  svg {
+    color: var(--school-primary);
+    opacity: .45;
+  }
+
+  p {
+    font-size: 14px;
+  }
+}
+
+.map-placeholder__hint {
+  font-size: 12px !important;
+  opacity: .7;
 }
 
 .admin-title {
   font-size: 20px;
   font-weight: 600;
-  color: $navy;
+  color: var(--school-primary);
   margin-bottom: 16px;
 }
 
@@ -162,9 +174,9 @@ const administration = [
 
 .admin-card {
   background: $white;
-  border: 1px solid $border;
-  border-left: 3px solid $gold;
-  border-radius: 0 $radius-lg $radius-lg 0;
+  border: 1px solid var(--school-card-border);
+  border-left: 3px solid var(--school-accent);
+  border-radius: 0 var(--school-card-radius) var(--school-card-radius) 0;
   padding: 16px 18px;
 }
 
@@ -183,9 +195,11 @@ const administration = [
 
 .admin-card__email {
   font-size: 13px;
-  color: $navy;
+  color: var(--school-primary);
   text-decoration: none;
 
-  &:hover { text-decoration: underline; }
+  &:hover {
+    text-decoration: underline;
+  }
 }
 </style>

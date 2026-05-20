@@ -330,10 +330,11 @@ const sections = computed(() => [
 }
 
 .admin-sidebar__link-icon {
-  width: 18px;
+  width: 24px;
   text-align: center;
   color: rgba($gold, .9);
-  font-size: 12px;
+  font-size: 16px;
+  line-height: 1;
   flex-shrink: 0;
 }
 </style>

@@ -10,7 +10,11 @@ defineProps<{
 const route = useRoute()
 
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+  return new Date(d).toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
 }
 </script>
 
@@ -37,15 +41,15 @@ function formatDate(d: string) {
   display: flex;
   flex-direction: column;
   background: $white;
-  border-radius: $radius-lg;
-  border: 1px solid $border;
+  border-radius: var(--school-card-radius, $radius-lg);
+  border: 1px solid var(--school-card-border, $border);
   overflow: hidden;
   text-decoration: none;
   color: inherit;
   transition: box-shadow $transition-base, transform $transition-base;
 
   &:hover {
-    box-shadow: 0 4px 20px rgba($navy, .1);
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--school-primary, #0F2A5E) 10%, transparent);
     transform: translateY(-2px);
   }
 
@@ -89,7 +93,9 @@ function formatDate(d: string) {
   line-height: 1.4;
   transition: color $transition-fast;
 
-  .news-card:hover & { color: $navy; }
+  .news-card:hover & {
+    color: var(--school-primary, $navy);
+  }
 }
 
 .news-card__excerpt {

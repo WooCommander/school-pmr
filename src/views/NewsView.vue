@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
 import NewsCard from '@/components/NewsCard.vue'
 import { categoryLabels, type NewsItem } from '@/data/news'
 import { getPublishedSchoolNews } from '@/modules/admin/state/school-news'
+import { useRoute } from 'vue-router'
 
 type Category = NewsItem['category'] | 'all'
 
@@ -26,7 +26,7 @@ const categories: { key: Category; label: string }[] = [
 const filtered = computed(() =>
   activeCategory.value === 'all'
     ? schoolNews.value
-    : schoolNews.value.filter((n) => n.category === activeCategory.value),
+    : schoolNews.value.filter((item) => item.category === activeCategory.value),
 )
 </script>
 
@@ -38,13 +38,13 @@ const filtered = computed(() =>
 
       <div class="filters" role="group" aria-label="Фильтр по категории">
         <button
-          v-for="cat in categories"
-          :key="cat.key"
+          v-for="category in categories"
+          :key="category.key"
           class="filter-btn"
-          :class="{ 'filter-btn--active': activeCategory === cat.key }"
-          @click="activeCategory = cat.key"
+          :class="{ 'filter-btn--active': activeCategory === category.key }"
+          @click="activeCategory = category.key"
         >
-          {{ cat.label }}
+          {{ category.label }}
         </button>
       </div>
 
@@ -82,18 +82,21 @@ const filtered = computed(() =>
   border-radius: 20px;
   font-size: 13px;
   font-weight: 400;
-  border: 1px solid $border;
+  border: 1px solid var(--school-card-border);
   background: $white;
   color: $text-secondary;
   cursor: pointer;
   white-space: nowrap;
   transition: all $transition-fast;
 
-  &:hover { border-color: $navy; color: $navy; }
+  &:hover {
+    border-color: var(--school-primary);
+    color: var(--school-primary);
+  }
 
   &--active {
-    background: $navy;
-    border-color: $navy;
+    background: var(--school-primary);
+    border-color: var(--school-primary);
     color: $white;
     font-weight: 500;
   }

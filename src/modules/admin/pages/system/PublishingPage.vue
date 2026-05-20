@@ -29,7 +29,7 @@ import { getThemePresetByKey } from '@/modules/admin/data/theme-presets'
 const route = useRoute()
 
 const schoolSlug = computed(() =>
-  typeof route.params.slug === 'string' ? route.params.slug : ''
+  typeof route.params.slug === 'string' ? route.params.slug : '',
 )
 
 const school = computed(() => findSchoolBySlug(schoolSlug.value))
@@ -52,7 +52,7 @@ const generalDirty = computed(() => {
     draft.city !== (baseSchool?.city ?? '') ||
     draft.description !==
       (baseSchool
-        ? `${baseSchool.fullName} — публичный сайт школы в единой системе управления.`
+        ? `${baseSchool.fullName} - публичный сайт школы в единой системе управления.`
         : '')
   )
 })
@@ -72,20 +72,20 @@ const contactsDirty = computed(() => {
 })
 
 const templateDirty = computed(
-  () => designDraft.value.draftTemplateKey !== designDraft.value.publishedTemplateKey
+  () => designDraft.value.draftTemplateKey !== designDraft.value.publishedTemplateKey,
 )
 const themeDirty = computed(
-  () => designDraft.value.draftThemeKey !== designDraft.value.publishedThemeKey
+  () => designDraft.value.draftThemeKey !== designDraft.value.publishedThemeKey,
 )
 const navigationDirty = computed(
   () =>
     JSON.stringify(navigationDraft.value.draftItems) !==
-    JSON.stringify(navigationDraft.value.publishedItems)
+    JSON.stringify(navigationDraft.value.publishedItems),
 )
 const modulesDirty = computed(
   () =>
     JSON.stringify(modulesDraft.value.draftItems) !==
-    JSON.stringify(modulesDraft.value.publishedItems)
+    JSON.stringify(modulesDraft.value.publishedItems),
 )
 
 const changeItems = computed(() => [
@@ -108,8 +108,8 @@ const changeItems = computed(() => [
   {
     key: 'template',
     title: 'Шаблон',
-    status: templateDirty.value ? 'Готов к публикации' : 'Актуально',
-    description: `${getTemplatePresetByKey(designDraft.value.draftTemplateKey)?.name ?? '—'} / опубликовано: ${
+    status: templateDirty.value ? 'Готов к публикации' : 'Актуален',
+    description: `${getTemplatePresetByKey(designDraft.value.draftTemplateKey)?.name ?? '—'} / опубликован: ${
       getTemplatePresetByKey(designDraft.value.publishedTemplateKey)?.name ?? '—'
     }`,
     dirty: templateDirty.value,
@@ -119,7 +119,7 @@ const changeItems = computed(() => [
     key: 'theme',
     title: 'Тема',
     status: themeDirty.value ? 'Готова к публикации' : 'Актуальна',
-    description: `${getThemePresetByKey(designDraft.value.draftThemeKey)?.name ?? '—'} / опубликовано: ${
+    description: `${getThemePresetByKey(designDraft.value.draftThemeKey)?.name ?? '—'} / опубликована: ${
       getThemePresetByKey(designDraft.value.publishedThemeKey)?.name ?? '—'
     }`,
     dirty: themeDirty.value,
@@ -145,20 +145,21 @@ const changeItems = computed(() => [
 
 const dirtyCount = computed(() => changeItems.value.filter((item) => item.dirty).length)
 const publishableDirtyCount = computed(() =>
-  changeItems.value.filter((item) => item.dirty && item.publishable).length
+  changeItems.value.filter((item) => item.dirty && item.publishable).length,
 )
 
 function publishAllAvailable() {
+  const hadChanges = publishableDirtyCount.value > 0
+
   if (templateDirty.value) publishSchoolDraftTemplate(schoolSlug.value)
   if (themeDirty.value) publishSchoolDraftTheme(schoolSlug.value)
   if (navigationDirty.value) publishSchoolNavigationDraft(schoolSlug.value)
   if (modulesDirty.value) publishSchoolModulesDraft(schoolSlug.value)
 
   statusTone.value = 'success'
-  statusMessage.value =
-    publishableDirtyCount.value > 0
-      ? 'Все доступные изменения опубликованы.'
-      : 'Публиковать нечего: опубликованные изменения уже актуальны.'
+  statusMessage.value = hadChanges
+    ? 'Все доступные изменения опубликованы.'
+    : 'Публиковать нечего: опубликованная версия уже актуальна.'
 }
 
 function discardAllDrafts() {
@@ -179,8 +180,8 @@ function discardAllDrafts() {
       <div>
         <h1>Публикация</h1>
         <p>
-          Единая точка контроля изменений по школе. Здесь видно, какие разделы
-          имеют черновики, а какие уже синхронизированы с опубликованной версией.
+          Единая точка контроля изменений по школе. Здесь видно, какие разделы имеют черновики,
+          а какие уже синхронизированы с опубликованной версией.
         </p>
       </div>
 
@@ -250,22 +251,22 @@ function discardAllDrafts() {
           </div>
 
           <ul class="check-list">
-            <li>шаблон сайта</li>
-            <li>цветовая тема</li>
-            <li>меню школы</li>
-            <li>состав системных модулей</li>
+            <li>Шаблон сайта</li>
+            <li>Цветовая тема</li>
+            <li>Меню школы</li>
+            <li>Состав системных модулей</li>
           </ul>
         </section>
 
         <section class="publishing-card">
           <div class="publishing-card__header">
-            <h2>Что пока в режиме MVP</h2>
+            <h2>Что еще в режиме MVP</h2>
           </div>
 
           <ul class="check-list">
-            <li>общая информация школы пока хранится как черновик в админке</li>
-            <li>контакты школы тоже доступны как draft-данные</li>
-            <li>следующий шаг — подключить их к публичной публикации</li>
+            <li>Общая информация школы пока хранится как draft в админке.</li>
+            <li>Контакты школы тоже пока доступны как draft-данные.</li>
+            <li>Следующий шаг — подключить и эти блоки к полноценной публикации.</li>
           </ul>
         </section>
       </aside>

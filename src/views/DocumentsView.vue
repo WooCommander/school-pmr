@@ -118,12 +118,12 @@ function formatDate(date: string) {
   transition: all $transition-fast;
 
   &:hover {
-    color: $navy;
+    color: var(--school-primary);
   }
 
   &--active {
-    color: $navy;
-    border-bottom-color: $gold;
+    color: var(--school-primary);
+    border-bottom-color: var(--school-accent);
     font-weight: 500;
   }
 }
@@ -139,13 +139,13 @@ function formatDate(date: string) {
   align-items: center;
   gap: 14px;
   background: $white;
-  border: 1px solid $border;
-  border-radius: $radius-lg;
+  border: 1px solid var(--school-card-border);
+  border-radius: var(--school-card-radius);
   padding: 16px 18px;
   transition: box-shadow $transition-base;
 
   &:hover {
-    box-shadow: 0 2px 12px rgba($navy, .07);
+    box-shadow: 0 2px 12px color-mix(in srgb, var(--school-primary) 8%, transparent);
   }
 
   @media (max-width: $mobile-breakpoint) {
@@ -156,12 +156,12 @@ function formatDate(date: string) {
 .doc-item__icon {
   width: 44px;
   height: 44px;
-  background: rgba($navy, .07);
+  background: color-mix(in srgb, var(--school-primary) 8%, white);
   border-radius: $radius-md;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $navy;
+  color: var(--school-primary);
   flex-shrink: 0;
 }
 
@@ -192,8 +192,8 @@ function formatDate(date: string) {
 
 .doc-item__category {
   font-size: 11px;
-  background: $surface-2;
-  color: $text-secondary;
+  background: color-mix(in srgb, var(--school-primary) 7%, white);
+  color: var(--school-primary);
   padding: 2px 8px;
   border-radius: 12px;
 }
@@ -211,8 +211,8 @@ function formatDate(date: string) {
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 500;
-  color: $navy;
-  border: 1px solid $navy;
+  color: var(--school-primary);
+  border: 1px solid var(--school-primary);
   border-radius: $radius-md;
   text-decoration: none;
   white-space: nowrap;
@@ -220,7 +220,7 @@ function formatDate(date: string) {
   flex-shrink: 0;
 
   &:hover {
-    background: $navy;
+    background: var(--school-primary);
     color: $white;
   }
 }

@@ -95,33 +95,33 @@ function routeFor(name: string) {
             расписание и контактную информацию.
           </p>
           <p>
-            Такой формат позволяет использовать единый современный дизайн для разных школ,
-            сохраняя отдельный вход и отдельную навигацию для каждой из них.
+            Теперь визуальная тема и шаблон школы берутся из опубликованной версии админки,
+            поэтому разные школы могут выглядеть по-разному внутри общей платформы.
           </p>
-          <router-link :to="routeFor('school-contacts')" class="btn btn--primary" style="margin-top:8px;display:inline-flex">
+          <router-link :to="routeFor('school-contacts')" class="btn btn--primary about-band__cta">
             Узнать больше
           </router-link>
         </div>
         <div class="about-band__features">
           <div class="about-band__feature">
-            <div class="about-band__feature-icon">🏆</div>
+            <div class="about-band__feature-icon">★</div>
             <div>
               <p class="about-band__feature-title">Достижения</p>
               <p class="about-band__feature-sub">Новости, результаты олимпиад и ключевые события школьной жизни.</p>
             </div>
           </div>
           <div class="about-band__feature">
-            <div class="about-band__feature-icon">📚</div>
+            <div class="about-band__feature-icon">▣</div>
             <div>
               <p class="about-band__feature-title">Обучение</p>
               <p class="about-band__feature-sub">Педагоги, расписание и документы в одном публичном контуре.</p>
             </div>
           </div>
           <div class="about-band__feature">
-            <div class="about-band__feature-icon">🤝</div>
+            <div class="about-band__feature-icon">✦</div>
             <div>
               <p class="about-band__feature-title">Коммуникация</p>
-              <p class="about-band__feature-sub">У родителей и учеников есть отдельная входная точка для каждой школы.</p>
+              <p class="about-band__feature-sub">У родителей и учеников есть единая понятная входная точка для каждой школы.</p>
             </div>
           </div>
         </div>
@@ -132,7 +132,7 @@ function routeFor(name: string) {
 
 <style lang="scss" scoped>
 .hero {
-  background: $navy;
+  background: var(--school-hero-bg);
   padding: 64px 0 56px;
 
   @media (max-width: $mobile-breakpoint) {
@@ -144,6 +144,11 @@ function routeFor(name: string) {
   display: flex;
   flex-direction: column;
   gap: 40px;
+  text-align: var(--school-hero-align);
+}
+
+.hero__content {
+  margin-inline: auto 0;
 }
 
 .hero__eyebrow {
@@ -173,7 +178,7 @@ function routeFor(name: string) {
   font-size: 16px;
   color: rgba($white, .75);
   line-height: 1.65;
-  max-width: 520px;
+  max-width: var(--school-hero-max);
   margin-top: 12px;
 
   @media (max-width: $mobile-breakpoint) {
@@ -206,7 +211,7 @@ function routeFor(name: string) {
 .hero__stat {
   background: rgba($white, .08);
   border: 1px solid rgba($white, .12);
-  border-radius: $radius-md;
+  border-radius: var(--school-card-radius);
   padding: 16px;
   text-align: center;
 }
@@ -246,29 +251,29 @@ function routeFor(name: string) {
   align-items: center;
   gap: 14px;
   background: $white;
-  border: 1px solid $border;
-  border-radius: $radius-lg;
+  border: 1px solid var(--school-card-border);
+  border-radius: var(--school-card-radius);
   padding: 18px 16px;
   text-decoration: none;
   color: $text-primary;
   transition: box-shadow $transition-base, transform $transition-base;
 
   &:hover {
-    box-shadow: 0 4px 16px rgba($navy, .1);
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--school-primary) 10%, transparent);
     transform: translateY(-2px);
-    color: $navy;
+    color: var(--school-primary);
   }
 }
 
 .quick__icon {
   width: 48px;
   height: 48px;
-  background: rgba($navy, .07);
+  background: color-mix(in srgb, var(--school-primary) 8%, white);
   border-radius: $radius-md;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $navy;
+  color: var(--school-primary);
   flex-shrink: 0;
 }
 
@@ -294,7 +299,7 @@ function routeFor(name: string) {
 }
 
 .about-band {
-  background: $surface-2;
+  background: var(--school-hero-subtle);
   padding: 56px 0;
 
   @media (max-width: $mobile-breakpoint) {
@@ -318,7 +323,7 @@ function routeFor(name: string) {
   h2 {
     font-size: 26px;
     font-weight: 600;
-    color: $navy;
+    color: var(--school-primary);
     margin-bottom: 16px;
   }
 
@@ -328,6 +333,11 @@ function routeFor(name: string) {
     line-height: 1.7;
     margin-bottom: 12px;
   }
+}
+
+.about-band__cta {
+  margin-top: 8px;
+  display: inline-flex;
 }
 
 .about-band__features {
@@ -343,16 +353,17 @@ function routeFor(name: string) {
 }
 
 .about-band__feature-icon {
-  font-size: 28px;
+  font-size: 24px;
   flex-shrink: 0;
   width: 44px;
   height: 44px;
   background: $white;
-  border-radius: $radius-md;
+  border-radius: var(--school-card-radius);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid $border;
+  border: 1px solid var(--school-card-border);
+  color: var(--school-primary);
 }
 
 .about-band__feature-title {
@@ -366,5 +377,17 @@ function routeFor(name: string) {
   font-size: 13px;
   color: $text-secondary;
   line-height: 1.4;
+}
+
+:global(.school-hero--centered) .hero__content {
+  margin: 0 auto;
+}
+
+:global(.school-hero--centered) .hero__actions {
+  justify-content: center;
+}
+
+:global(.school-hero--minimal) .hero {
+  padding: 42px 0 34px;
 }
 </style>
