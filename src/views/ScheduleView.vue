@@ -1,14 +1,27 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { bells, sampleSchedule, classGroups, weekDays } from '@/data/schedule'
+import { computed, ref, watchEffect } from 'vue'
 import { useCurrentSchool } from '@/composables/useCurrentSchool'
+import { getScheduleSnapshotState } from '@/modules/schedule/state/schedule-state'
 
 const { school } = useCurrentSchool()
-const selectedClass = ref('5А')
+const selectedClass = ref('')
 
-const schedule = computed(() =>
-  sampleSchedule[selectedClass.value] ?? null,
-)
+const scheduleSnapshot = computed(() => getScheduleSnapshotState(school.value.slug))
+const classGroups = computed(() => scheduleSnapshot.value.classGroups)
+const bells = computed(() => scheduleSnapshot.value.bells)
+const weekDays = computed(() => scheduleSnapshot.value.weekDays)
+const schedule = computed(() => scheduleSnapshot.value.schedules[selectedClass.value] ?? null)
+
+watchEffect(() => {
+  if (!classGroups.value.length) {
+    selectedClass.value = ''
+    return
+  }
+
+  if (!classGroups.value.includes(selectedClass.value)) {
+    selectedClass.value = classGroups.value[0]
+  }
+})
 
 function getLesson(dayIdx: number, lessonIdx: number) {
   return schedule.value?.[dayIdx]?.[lessonIdx] ?? null
@@ -39,7 +52,7 @@ function getLesson(dayIdx: number, lessonIdx: number) {
         <div class="bells-grid">
           <div v-for="bell in bells" :key="bell.number" class="bell-item">
             <span class="bell-item__num">{{ bell.number }}</span>
-            <span class="bell-item__time">{{ bell.start }} – {{ bell.end }}</span>
+            <span class="bell-item__time">{{ bell.start }} - {{ bell.end }}</span>
             <span v-if="bell.note" class="bell-item__note">{{ bell.note }}</span>
           </div>
         </div>
@@ -77,7 +90,7 @@ function getLesson(dayIdx: number, lessonIdx: number) {
                     <p class="schedule-table__teacher">{{ getLesson(dayIdx, lessonIdx)!.teacher }}</p>
                     <span class="schedule-table__room">каб. {{ getLesson(dayIdx, lessonIdx)!.room }}</span>
                   </template>
-                  <span v-else class="schedule-table__empty">—</span>
+                  <span v-else class="schedule-table__empty">-</span>
                 </td>
               </tr>
             </tbody>

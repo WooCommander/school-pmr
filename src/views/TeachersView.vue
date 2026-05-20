@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { getTeachersBySchool } from '@/data/teachers'
 import { useCurrentSchool } from '@/composables/useCurrentSchool'
+import { getTeachersBySchoolState } from '@/modules/teachers/state/teacher-directory'
 
 const { school } = useCurrentSchool()
 const search = ref('')
 
-const schoolTeachers = computed(() => getTeachersBySchool(school.value.slug))
+const schoolTeachers = computed(() => getTeachersBySchoolState(school.value.slug))
 
 const filtered = computed(() => {
   const query = search.value.toLowerCase()

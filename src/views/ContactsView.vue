@@ -1,21 +1,38 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useCurrentSchool } from '@/composables/useCurrentSchool'
+import { getAdministrationBySchoolState } from '@/modules/teachers/state/teacher-directory'
 
 const { school } = useCurrentSchool()
 
 const contacts = computed(() => [
-  { icon: 'phone', label: 'Телефон', value: school.value.phone, href: `tel:${school.value.phone.replace(/[^+\d]/g, '')}` },
-  { icon: 'mail', label: 'Электронная почта', value: school.value.email, href: `mailto:${school.value.email}` },
-  { icon: 'map-pin', label: 'Адрес', value: school.value.address, href: null },
-  { icon: 'clock', label: 'Режим работы', value: school.value.hours, href: null },
+  {
+    icon: 'phone',
+    label: 'Телефон',
+    value: school.value.phone,
+    href: `tel:${school.value.phone.replace(/[^+\d]/g, '')}`,
+  },
+  {
+    icon: 'mail',
+    label: 'Электронная почта',
+    value: school.value.email,
+    href: `mailto:${school.value.email}`,
+  },
+  {
+    icon: 'map-pin',
+    label: 'Адрес',
+    value: school.value.address,
+    href: null,
+  },
+  {
+    icon: 'clock',
+    label: 'Режим работы',
+    value: school.value.hours,
+    href: null,
+  },
 ])
 
-const administration = [
-  { role: 'Директор', name: 'Иванова Светлана Николаевна', email: 'director@school1-dnestrovsk.ru' },
-  { role: 'Зам. директора по учебной работе', name: 'Петров Андрей Викторович', email: 'zavuch@school1-dnestrovsk.ru' },
-  { role: 'Зам. директора по воспитательной работе', name: 'Федорова Людмила Борисовна', email: null },
-]
+const administration = computed(() => getAdministrationBySchoolState(school.value.slug))
 </script>
 
 <template>
@@ -34,10 +51,65 @@ const administration = [
             :class="{ 'contact-card--link': !!contact.href }"
           >
             <div class="contact-card__icon">
-              <svg v-if="contact.icon === 'phone'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.35 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6.45 6.45l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              <svg v-else-if="contact.icon === 'mail'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              <svg v-else-if="contact.icon === 'map-pin'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <svg v-else-if="contact.icon === 'clock'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <svg
+                v-if="contact.icon === 'phone'"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.35 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6.45 6.45l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+              </svg>
+              <svg
+                v-else-if="contact.icon === 'mail'"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+              <svg
+                v-else-if="contact.icon === 'map-pin'"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <svg
+                v-else-if="contact.icon === 'clock'"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
             </div>
             <div>
               <p class="contact-card__label">{{ contact.label }}</p>
@@ -48,7 +120,20 @@ const administration = [
 
         <div class="map-placeholder">
           <div class="map-placeholder__inner">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <svg
+              width="36"
+              height="36"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
             <p>{{ school.address }}</p>
             <p class="map-placeholder__hint">Карта появится после подключения реального map-embed.</p>
           </div>

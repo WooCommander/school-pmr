@@ -164,6 +164,5 @@ export const teachers: Teacher[] = [
 ]
 
 export function getTeachersBySchool(schoolSlug: string) {
-  const schoolTeachers = teachers.filter((teacher) => teacher.schoolSlug === schoolSlug)
-  return schoolTeachers.length ? schoolTeachers : teachers.filter((teacher) => teacher.schoolSlug === 'dnestrovsk-school-1')
+  return teachers.filter((teacher) => teacher.schoolSlug === schoolSlug)
 }

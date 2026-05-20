@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import { teachers } from '@/data/teachers'
 import {
   getAdminRoleForSchool,
   getAdminRoleLabel,
@@ -14,6 +13,7 @@ import { getThemePresetByKey } from '@/modules/admin/data/theme-presets'
 import { ensureSchoolDesignDraft } from '@/modules/admin/state/school-design'
 import { ensureSchoolSettingsDraft } from '@/modules/admin/state/school-settings'
 import { getManagedSchoolBySlug } from '@/modules/schools/state/school-directory'
+import { getTeacherCountBySchoolState } from '@/modules/teachers/state/teacher-directory'
 
 const route = useRoute()
 const { currentUser } = useAdminAuth()
@@ -48,9 +48,7 @@ const publicationState = computed(() => ({
     designDraft.value.draftThemeKey !== designDraft.value.publishedThemeKey,
 }))
 
-const teacherCount = computed(
-  () => teachers.filter((item) => item.schoolSlug === schoolSlug.value).length,
-)
+const teacherCount = computed(() => getTeacherCountBySchoolState(schoolSlug.value))
 const documentCount = computed(() => getSchoolDocuments(schoolSlug.value).length)
 const newsCount = computed(() => getSchoolNews(schoolSlug.value).length)
 

@@ -4,7 +4,7 @@ import {
   type SchoolGeneralDraft,
   peekSchoolSettingsDraft,
 } from '@/modules/admin/state/school-settings'
-import { getTeachersBySchool } from '@/data/teachers'
+import { getTeacherCountBySchoolState } from '@/modules/teachers/state/teacher-directory'
 import {
   getDefaultSchoolSlugService,
   getSchoolBySlugService,
@@ -49,7 +49,7 @@ function applyDerivedContent(school: SchoolProfile, general?: SchoolGeneralDraft
 }
 
 function applyDerivedStats(school: SchoolProfile): SchoolProfile {
-  const teacherCount = getTeachersBySchool(school.slug).length
+  const teacherCount = getTeacherCountBySchoolState(school.slug)
 
   return {
     ...school,
