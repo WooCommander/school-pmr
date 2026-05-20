@@ -2,6 +2,7 @@ export type GalleryCategory = 'all' | 'events' | 'study' | 'sport' | 'holidays'
 
 export interface GalleryItemDTO {
   id: string
+  schoolSlug: string
   title: string
   category: 'events' | 'study' | 'sport' | 'holidays'
   date: string
@@ -11,6 +12,7 @@ export interface GalleryItemDTO {
 
 export interface GalleryItemUI {
   id: string
+  schoolSlug: string
   title: string
   category: 'events' | 'study' | 'sport' | 'holidays'
   categoryLabel: string

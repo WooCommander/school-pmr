@@ -6,11 +6,11 @@ import {
   getAdminRoleLabel,
   useAdminAuth,
 } from '@/modules/admin/state/admin-auth'
-import { getSchoolDocuments } from '@/modules/admin/state/school-documents'
-import { getSchoolNews } from '@/modules/admin/state/school-news'
 import { getTemplatePresetByKey } from '@/modules/admin/data/template-presets'
 import { getThemePresetByKey } from '@/modules/admin/data/theme-presets'
 import { ensureSchoolDesignDraft } from '@/modules/admin/state/school-design'
+import { getSchoolDocuments } from '@/modules/admin/state/school-documents'
+import { getSchoolNews } from '@/modules/admin/state/school-news'
 import { ensureSchoolSettingsDraft } from '@/modules/admin/state/school-settings'
 import { getManagedSchoolBySlug } from '@/modules/schools/state/school-directory'
 import { getTeacherCountBySchoolState } from '@/modules/teachers/state/teacher-directory'
@@ -143,7 +143,7 @@ const quickActions = computed(() => [
       </article>
       <article class="stat-card">
         <span class="stat-card__value">{{ newsCount }}</span>
-        <span class="stat-card__label">Новостей в текущем mock-наборе</span>
+        <span class="stat-card__label">Новостей в текущем наборе</span>
       </article>
       <article class="stat-card">
         <span class="stat-card__value">{{ currentSchool?.stats?.[0]?.value || '—' }}</span>

@@ -13,32 +13,29 @@ export function useGalleryState() {
     if (selectedCategory.value === 'all') {
       return items.value
     }
-    return items.value.filter(item => item.category === selectedCategory.value)
+
+    return items.value.filter((item) => item.category === selectedCategory.value)
   })
 
   const activeItem = computed<GalleryItemUI | null>(() => {
     if (!activeItemId.value) return null
-    return items.value.find(item => item.id === activeItemId.value) ?? null
+    return items.value.find((item) => item.id === activeItemId.value) ?? null
   })
 
   const activeIndex = computed<number>(() => {
     if (!activeItemId.value) return -1
-    return filteredItems.value.findIndex(item => item.id === activeItemId.value)
+    return filteredItems.value.findIndex((item) => item.id === activeItemId.value)
   })
 
-  const hasNext = computed<boolean>(() => {
-    return activeIndex.value >= 0 && activeIndex.value < filteredItems.value.length - 1
-  })
+  const hasNext = computed<boolean>(() => activeIndex.value >= 0 && activeIndex.value < filteredItems.value.length - 1)
+  const hasPrev = computed<boolean>(() => activeIndex.value > 0)
 
-  const hasPrev = computed<boolean>(() => {
-    return activeIndex.value > 0
-  })
-
-  async function loadItems(): Promise<void> {
+  async function loadItems(schoolSlug: string): Promise<void> {
     loading.value = true
     error.value = null
+
     try {
-      items.value = await getGalleryItemsService()
+      items.value = await getGalleryItemsService(schoolSlug)
     } catch (err) {
       error.value = 'Не удалось загрузить фотографии. Пожалуйста, повторите попытку.'
       console.error(err)
@@ -90,6 +87,6 @@ export function useGalleryState() {
     openModal,
     closeModal,
     nextPhoto,
-    prevPhoto
+    prevPhoto,
   }
 }

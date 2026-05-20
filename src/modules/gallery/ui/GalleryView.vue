@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
+import { useCurrentSchool } from '@/composables/useCurrentSchool'
 import { useGalleryState } from '../state/gallery-state'
 import GalleryFilter from './GalleryFilter.vue'
 import GalleryCard from './GalleryCard.vue'
 import GalleryModal from './GalleryModal.vue'
+
+const { school } = useCurrentSchool()
+const galleryState = useGalleryState()
 
 const {
   loading,
@@ -18,12 +22,23 @@ const {
   openModal,
   closeModal,
   nextPhoto,
-  prevPhoto
-} = useGalleryState()
+  prevPhoto,
+} = galleryState
+
+const subtitle = computed(() => `Фотографии и события из жизни ${school.value.fullName}`)
 
 onMounted(() => {
-  loadItems()
+  loadItems(school.value.slug)
 })
+
+watch(
+  () => school.value.slug,
+  (schoolSlug) => {
+    selectedCategory.value = 'all'
+    closeModal()
+    loadItems(schoolSlug)
+  },
+)
 </script>
 
 <template>
@@ -32,33 +47,28 @@ onMounted(() => {
       <header class="gallery-page__header">
         <h1 class="gallery-page__title">Фотогалерея школы</h1>
         <p class="gallery-page__subtitle">
-          Яркие моменты из жизни учеников и учителей Днестровской средней школы №1
+          {{ subtitle }}
         </p>
       </header>
 
-      <!-- Фильтр категорий -->
       <GalleryFilter
         :model-value="selectedCategory"
         @update:model-value="setCategory"
       />
 
-      <!-- Состояние загрузки -->
       <div v-if="loading" class="gallery-page__state">
         <div class="gallery-page__loader" role="status" aria-label="Загрузка фотографий"></div>
       </div>
 
-      <!-- Состояние ошибки -->
       <div v-else-if="error" class="gallery-page__state gallery-page__state--error">
         <p>{{ error }}</p>
-        <button class="gallery-page__retry" @click="loadItems">Повторить загрузку</button>
+        <button class="gallery-page__retry" @click="loadItems(school.slug)">Повторить загрузку</button>
       </div>
 
-      <!-- Пустое состояние -->
       <div v-else-if="filteredItems.length === 0" class="gallery-page__state">
-        <p>В данной категории пока нет фотографий.</p>
+        <p>У этой школы пока нет опубликованных фотографий.</p>
       </div>
 
-      <!-- Сетка фотоальбомов -->
       <TransitionGroup v-else tag="div" name="grid-anim" class="gallery-page__grid">
         <GalleryCard
           v-for="item in filteredItems"
@@ -69,7 +79,6 @@ onMounted(() => {
       </TransitionGroup>
     </div>
 
-    <!-- Модальное окно просмотра -->
     <GalleryModal
       :item="activeItem"
       :has-next="hasNext"
@@ -97,7 +106,7 @@ onMounted(() => {
 
 .gallery-page__header {
   text-align: center;
-  max-width: 700px;
+  max-width: 720px;
   margin: 0 auto 40px;
 }
 
@@ -177,7 +186,6 @@ onMounted(() => {
   }
 }
 
-/* Анимация элементов сетки */
 .grid-anim-move,
 .grid-anim-enter-active,
 .grid-anim-leave-active {

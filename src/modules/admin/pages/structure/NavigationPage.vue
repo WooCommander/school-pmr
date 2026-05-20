@@ -462,6 +462,21 @@ function publishedVisibility(itemKey: string) {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+
+  @media (max-width: $mobile-breakpoint) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: calc(100% + 32px);
+    margin-inline: -16px;
+    padding: 0 16px 6px;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
 }
 
 .menu-preview__chip {
@@ -473,6 +488,8 @@ function publishedVisibility(itemKey: string) {
   color: $navy;
   font-size: 13px;
   font-weight: 600;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .check-list {

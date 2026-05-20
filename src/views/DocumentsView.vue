@@ -95,8 +95,14 @@ function formatDate(date: string) {
   padding-bottom: 0;
 
   @media (max-width: $mobile-breakpoint) {
+    display: block;
     overflow-x: auto;
-    flex-wrap: nowrap;
+    white-space: nowrap;
+    width: calc(100% + 32px);
+    margin-inline: -16px;
+    padding: 0 16px 6px;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
 
     &::-webkit-scrollbar {
@@ -106,6 +112,8 @@ function formatDate(date: string) {
 }
 
 .tab {
+  display: inline-flex;
+  align-items: center;
   padding: 9px 16px;
   font-size: 14px;
   color: $text-secondary;

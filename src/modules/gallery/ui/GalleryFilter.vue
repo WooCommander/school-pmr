@@ -31,29 +31,58 @@ function onSelect(value: GalleryCategory): void {
 
 <template>
   <nav class="gallery-filter" aria-label="Фильтр фотографий">
-    <button
-      v-for="opt in options"
-      :key="opt.value"
-      class="gallery-filter__btn"
-      :class="{ 'gallery-filter__btn--active': props.modelValue === opt.value }"
-      @click="onSelect(opt.value)"
-    >
-      {{ opt.label }}
-    </button>
+    <div class="gallery-filter__track">
+      <button
+        v-for="opt in options"
+        :key="opt.value"
+        class="gallery-filter__btn"
+        :class="{ 'gallery-filter__btn--active': props.modelValue === opt.value }"
+        @click="onSelect(opt.value)"
+      >
+        {{ opt.label }}
+      </button>
+    </div>
   </nav>
 </template>
 
 <style scoped lang="scss">
 .gallery-filter {
+  margin-bottom: 32px;
+
+  @media (max-width: $mobile-breakpoint) {
+    overflow-x: auto;
+    width: calc(100% + 28px);
+    margin-inline: -14px;
+    padding: 0 14px 6px;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.gallery-filter__track {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 32px;
+
+  @media (max-width: $mobile-breakpoint) {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    min-width: max-content;
+    white-space: nowrap;
+  }
 }
 
 .gallery-filter__btn {
+  display: inline-flex;
+  align-items: center;
   padding: 10px 20px;
   font-size: 14px;
   font-weight: 500;
@@ -62,6 +91,7 @@ function onSelect(value: GalleryCategory): void {
   border: 1px solid $border;
   border-radius: 30px;
   cursor: pointer;
+  white-space: nowrap;
   transition: all $transition-fast;
 
   &:hover {

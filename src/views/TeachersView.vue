@@ -11,6 +11,7 @@ const schoolTeachers = computed(() => getTeachersBySchoolState(school.value.slug
 const filtered = computed(() => {
   const query = search.value.toLowerCase()
   if (!query) return schoolTeachers.value
+
   return schoolTeachers.value.filter((teacher) =>
     teacher.name.toLowerCase().includes(query) ||
     teacher.subject.toLowerCase().includes(query),

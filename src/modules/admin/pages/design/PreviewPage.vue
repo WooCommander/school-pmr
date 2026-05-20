@@ -556,6 +556,21 @@ function sectionTitle() {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+
+  @media (max-width: $mobile-breakpoint) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: calc(100% + 32px);
+    margin-inline: -16px;
+    padding: 0 16px 6px;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
 }
 
 .preview-badge {
@@ -567,6 +582,8 @@ function sectionTitle() {
   color: $navy;
   font-size: 13px;
   font-weight: 600;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .preview-page__layout {
@@ -604,11 +621,31 @@ function sectionTitle() {
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 14px;
+
+  @media (max-width: $mobile-breakpoint) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: calc(100% + 32px);
+    margin-inline: -16px;
+    padding: 0 16px 6px;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
 }
 
 .toggle-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  @media (max-width: $mobile-breakpoint) {
+    display: flex;
+    grid-template-columns: none;
+  }
 }
 
 .toggle-chip {
@@ -618,6 +655,8 @@ function sectionTitle() {
   padding: 10px 14px;
   font-size: 14px;
   color: $text-secondary;
+  white-space: nowrap;
+  flex: 0 0 auto;
   transition: border-color $transition-fast, background $transition-fast, color $transition-fast;
 
   &--active {
@@ -1069,6 +1108,19 @@ function sectionTitle() {
   gap: 10px;
   flex-wrap: wrap;
 
+  @media (max-width: $mobile-breakpoint) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
   span {
     display: inline-flex;
     align-items: center;
@@ -1078,6 +1130,8 @@ function sectionTitle() {
     color: var(--preview-primary);
     font-size: 13px;
     font-weight: 600;
+    white-space: nowrap;
+    flex: 0 0 auto;
   }
 }
 

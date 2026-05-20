@@ -68,9 +68,14 @@ const filtered = computed(() =>
   margin-bottom: 28px;
 
   @media (max-width: $mobile-breakpoint) {
+    display: block;
     overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: 4px;
+    white-space: nowrap;
+    width: calc(100% + 32px);
+    margin-inline: -16px;
+    padding: 0 16px 6px;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
 
     &::-webkit-scrollbar { display: none; }
@@ -78,6 +83,8 @@ const filtered = computed(() =>
 }
 
 .filter-btn {
+  display: inline-flex;
+  align-items: center;
   padding: 7px 16px;
   border-radius: 20px;
   font-size: 13px;
