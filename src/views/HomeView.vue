@@ -2,14 +2,17 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import NewsCard from '@/components/NewsCard.vue'
+import SchoolEmblem from '@/components/SchoolEmblem.vue'
 import { useCurrentSchool } from '@/composables/useCurrentSchool'
 import { getPublishedSchoolNews } from '@/modules/admin/state/school-news'
 
 const route = useRoute()
 const { school } = useCurrentSchool()
+
 const schoolSlug = computed(() =>
   typeof route.params.slug === 'string' ? route.params.slug : school.value.slug,
 )
+
 const latestNews = computed(() => getPublishedSchoolNews(schoolSlug.value).slice(0, 4))
 
 const quickLinks = [
@@ -19,8 +22,29 @@ const quickLinks = [
   { name: 'school-documents', label: 'Документы', icon: 'file' },
 ]
 
+const schoolHighlights = computed(() => [
+  { label: 'Тип школы', value: school.value.type },
+  { label: 'Адрес', value: school.value.address },
+  { label: 'Режим работы', value: school.value.hours },
+])
+
 function routeFor(name: string) {
   return { name, params: { slug: route.params.slug } }
+}
+
+function featureIcon(icon: string) {
+  switch (icon) {
+    case 'book':
+      return '▣'
+    case 'chat':
+      return '◌'
+    case 'award':
+      return '◆'
+    case 'users':
+      return '◍'
+    default:
+      return '★'
+  }
 }
 </script>
 
@@ -28,20 +52,55 @@ function routeFor(name: string) {
   <div>
     <section class="hero">
       <div class="container hero__inner">
-        <div class="hero__content">
+        <div class="hero__copy">
           <p class="hero__eyebrow">{{ school.city }}</p>
+
           <h1 class="hero__title">
             <template v-for="(line, index) in school.heroTitle.split('\n')" :key="index">
               <span>{{ line }}</span>
               <br v-if="index < school.heroTitle.split('\n').length - 1">
             </template>
           </h1>
+
           <p class="hero__sub">{{ school.heroText }}</p>
+
           <div class="hero__actions">
-            <router-link :to="routeFor('school-news')" class="btn btn--gold">Актуальные новости</router-link>
-            <router-link :to="routeFor('school-contacts')" class="btn btn--outline hero__btn-light">Связаться</router-link>
+            <router-link :to="routeFor('school-news')" class="btn btn--gold">
+              Актуальные новости
+            </router-link>
+            <router-link
+              :to="routeFor('school-contacts')"
+              class="btn btn--outline hero__btn-light"
+            >
+              Связаться
+            </router-link>
           </div>
         </div>
+
+        <div class="hero__panel">
+          <div class="hero-card">
+            <div class="hero-card__brand">
+              <SchoolEmblem size="54" />
+
+              <div>
+                <p class="hero-card__short">{{ school.shortName }}</p>
+                <p class="hero-card__full">{{ school.fullName }}</p>
+              </div>
+            </div>
+
+            <div class="hero-card__highlights">
+              <div v-for="item in schoolHighlights" :key="item.label" class="hero-card__highlight">
+                <span>{{ item.label }}</span>
+                <strong>{{ item.value }}</strong>
+              </div>
+            </div>
+
+            <router-link :to="routeFor('school-contacts')" class="hero-card__link">
+              Контакты и администрация
+            </router-link>
+          </div>
+        </div>
+
         <div class="hero__stats">
           <div v-for="s in school.stats" :key="s.label" class="hero__stat">
             <span class="hero__stat-val">{{ s.value }}</span>
@@ -61,13 +120,93 @@ function routeFor(name: string) {
             class="quick__item"
           >
             <div class="quick__icon">
-              <svg v-if="link.icon === 'news'" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6z"/></svg>
-              <svg v-else-if="link.icon === 'calendar'" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              <svg v-else-if="link.icon === 'users'" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              <svg v-else-if="link.icon === 'file'" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <svg
+                v-if="link.icon === 'news'"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"
+                />
+                <path d="M18 14h-8" />
+                <path d="M15 18h-5" />
+                <path d="M10 6h8v4h-8V6z" />
+              </svg>
+              <svg
+                v-else-if="link.icon === 'calendar'"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+              <svg
+                v-else-if="link.icon === 'users'"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              <svg
+                v-else-if="link.icon === 'file'"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg>
             </div>
             <span class="quick__label">{{ link.label }}</span>
-            <svg class="quick__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            <svg
+              class="quick__arrow"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
           </router-link>
         </div>
       </div>
@@ -91,37 +230,42 @@ function routeFor(name: string) {
           <h2>О школе</h2>
           <p>
             {{ school.fullName }} — {{ school.type.toLowerCase() }} в {{ school.city }}.
-            Публичный раздел объединяет новости, документы, педагогический состав,
-            расписание и контактную информацию.
           </p>
           <p>
-            Теперь визуальная тема и шаблон школы берутся из опубликованной версии админки,
-            поэтому разные школы могут выглядеть по-разному внутри общей платформы.
+            Публичный раздел объединяет новости, документы, педагогический состав,
+            расписание и контактную информацию.
           </p>
           <router-link :to="routeFor('school-contacts')" class="btn btn--primary about-band__cta">
             Узнать больше
           </router-link>
         </div>
+
         <div class="about-band__features">
           <div class="about-band__feature">
-            <div class="about-band__feature-icon">★</div>
+            <div class="about-band__feature-icon">{{ featureIcon('award') }}</div>
             <div>
               <p class="about-band__feature-title">Достижения</p>
-              <p class="about-band__feature-sub">Новости, результаты олимпиад и ключевые события школьной жизни.</p>
+              <p class="about-band__feature-sub">
+                Новости, результаты олимпиад и ключевые события школьной жизни.
+              </p>
             </div>
           </div>
           <div class="about-band__feature">
-            <div class="about-band__feature-icon">▣</div>
+            <div class="about-band__feature-icon">{{ featureIcon('book') }}</div>
             <div>
               <p class="about-band__feature-title">Обучение</p>
-              <p class="about-band__feature-sub">Педагоги, расписание и документы в одном публичном контуре.</p>
+              <p class="about-band__feature-sub">
+                Педагоги, расписание и документы в одном публичном контуре.
+              </p>
             </div>
           </div>
           <div class="about-band__feature">
-            <div class="about-band__feature-icon">✦</div>
+            <div class="about-band__feature-icon">{{ featureIcon('chat') }}</div>
             <div>
               <p class="about-band__feature-title">Коммуникация</p>
-              <p class="about-band__feature-sub">У родителей и учеников есть единая понятная входная точка для каждой школы.</p>
+              <p class="about-band__feature-sub">
+                Понятная точка входа для родителей, учеников и гостей школы.
+              </p>
             </div>
           </div>
         </div>
@@ -132,57 +276,65 @@ function routeFor(name: string) {
 
 <style lang="scss" scoped>
 .hero {
-  background: var(--school-hero-bg);
-  padding: 64px 0 56px;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 85% 18%, rgba(255, 255, 255, .09), transparent 24%),
+    radial-gradient(circle at 10% 80%, rgba(255, 255, 255, .05), transparent 28%),
+    var(--school-hero-bg);
+  padding: 48px 0 34px;
 
   @media (max-width: $mobile-breakpoint) {
-    padding: 32px 0 28px;
+    padding: 28px 0 22px;
   }
 }
 
 .hero__inner {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-  text-align: var(--school-hero-align);
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+  gap: 32px;
+  align-items: center;
+
+  @media (max-width: 980px) {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
 }
 
-.hero__content {
-  margin-inline: auto 0;
+.hero__copy {
+  max-width: 620px;
 }
 
 .hero__eyebrow {
   font-size: 12px;
-  color: rgba($white, .6);
+  color: rgba($white, .62);
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
+  letter-spacing: .12em;
 }
 
 .hero__title {
-  font-size: 36px;
-  font-weight: 600;
+  margin-top: 12px;
+  font-size: clamp(34px, 3.6vw, 56px);
+  font-weight: 700;
+  line-height: .98;
+  letter-spacing: -.03em;
   color: $white;
-  line-height: 1.25;
-
-  span {
-    display: inline;
-  }
 
   @media (max-width: $mobile-breakpoint) {
-    font-size: 24px;
+    font-size: 30px;
+    line-height: 1.04;
   }
 }
 
 .hero__sub {
-  font-size: 16px;
-  color: rgba($white, .75);
-  line-height: 1.65;
-  max-width: var(--school-hero-max);
-  margin-top: 12px;
+  margin-top: 18px;
+  max-width: 560px;
+  font-size: 18px;
+  line-height: 1.5;
+  color: rgba($white, .78);
 
   @media (max-width: $mobile-breakpoint) {
-    font-size: 14px;
+    font-size: 15px;
   }
 }
 
@@ -195,44 +347,138 @@ function routeFor(name: string) {
 
 .hero__btn-light {
   color: $white;
-  border-color: rgba($white, .5);
+  border-color: rgba($white, .42);
+  background: rgba($white, .04);
+}
+
+.hero__panel {
+  display: flex;
+  justify-content: flex-end;
+
+  @media (max-width: 980px) {
+    justify-content: stretch;
+  }
+}
+
+.hero-card {
+  width: min(100%, 460px);
+  padding: 24px;
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .06));
+  border: 1px solid rgba(255, 255, 255, .12);
+  box-shadow: 0 24px 60px rgba(6, 16, 40, .18);
+  backdrop-filter: blur(10px);
+}
+
+.hero-card__brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.hero-card__logo {
+  width: 54px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 14px;
+  background: rgba($white, .94);
+  border: 1px solid rgba($white, .25);
+  flex-shrink: 0;
+}
+
+.hero-card__short {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba($white, .72);
+}
+
+.hero-card__full {
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: $white;
+}
+
+.hero-card__highlights {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.hero-card__highlight {
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, .1);
+
+  span,
+  strong {
+    display: block;
+  }
+
+  span {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: rgba($white, .56);
+  }
+
+  strong {
+    margin-top: 6px;
+    font-size: 15px;
+    line-height: 1.45;
+    color: rgba($white, .92);
+  }
+}
+
+.hero-card__link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 22px;
+  color: $white;
+  text-decoration: none;
+  font-weight: 600;
+
+  &:hover {
+    color: rgba($white, .78);
+  }
 }
 
 .hero__stats {
+  grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 
-  @media (max-width: $mobile-breakpoint) {
-    grid-template-columns: repeat(2, 1fr);
+  @media (max-width: 980px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 .hero__stat {
-  background: rgba($white, .08);
-  border: 1px solid rgba($white, .12);
-  border-radius: var(--school-card-radius);
-  padding: 16px;
+  padding: 18px 16px;
+  border-radius: 22px;
   text-align: center;
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .09);
 }
 
 .hero__stat-val {
   display: block;
-  font-size: 28px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
   color: $white;
   line-height: 1;
-
-  @media (max-width: $mobile-breakpoint) {
-    font-size: 22px;
-  }
 }
 
 .hero__stat-label {
   display: block;
+  margin-top: 8px;
   font-size: 12px;
-  color: rgba($white, .6);
-  margin-top: 4px;
+  line-height: 1.35;
+  color: rgba($white, .62);
 }
 
 .quick__grid {
@@ -377,17 +623,5 @@ function routeFor(name: string) {
   font-size: 13px;
   color: $text-secondary;
   line-height: 1.4;
-}
-
-:global(.school-hero--centered) .hero__content {
-  margin: 0 auto;
-}
-
-:global(.school-hero--centered) .hero__actions {
-  justify-content: center;
-}
-
-:global(.school-hero--minimal) .hero {
-  padding: 42px 0 34px;
 }
 </style>
