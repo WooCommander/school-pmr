@@ -9,7 +9,7 @@ import { getPublishedSchoolNavigation } from '@/modules/admin/state/school-navig
 
 const route = useRoute()
 const { school } = useCurrentSchool()
-const { publishedTemplate, publishedTheme } = useSchoolDesignDraft(school.value.slug)
+const { designDraft, publishedTemplate, publishedTheme } = useSchoolDesignDraft(school.value.slug)
 const mobileMenuOpen = ref(false)
 const scrolled = ref(false)
 
@@ -49,11 +49,25 @@ const layoutClass = computed(() => ({
   [`school-menu--${publishedTemplate.value?.menuStyle ?? 'top'}`]: true,
   [`school-hero--${publishedTemplate.value?.heroStyle ?? 'large'}`]: true,
   [`school-card--${publishedTemplate.value?.cardStyle ?? 'soft'}`]: true,
+  [`school-button--${designDraft.value.publishedCustomization.buttonStyle}`]: true,
+  [`school-density--${designDraft.value.publishedCustomization.density}`]: true,
+  [`school-contrast--${designDraft.value.publishedCustomization.contrast}`]: true,
 }))
 
 const layoutStyle = computed(() => {
   const theme = publishedTheme.value?.colors
   const template = publishedTemplate.value
+  const customization = designDraft.value.publishedCustomization
+  const radiusValue =
+    customization.radiusStyle === 'compact'
+      ? '12px'
+      : customization.radiusStyle === 'rounded'
+        ? '24px'
+        : template?.cardStyle === 'flat'
+          ? '12px'
+          : template?.cardStyle === 'bordered'
+            ? '20px'
+            : '18px'
 
   return {
     '--school-primary': theme?.primary ?? '#0F2A5E',
@@ -63,18 +77,20 @@ const layoutStyle = computed(() => {
     '--school-text': theme?.text ?? '#0F1E3C',
     '--school-hero-bg': `linear-gradient(135deg, ${theme?.primary ?? '#0F2A5E'}, ${theme?.secondary ?? '#1A3A7A'})`,
     '--school-hero-subtle': theme?.surface ?? '#F6F8FC',
-    '--school-card-radius':
-      template?.cardStyle === 'flat'
-        ? '12px'
-        : template?.cardStyle === 'bordered'
-          ? '20px'
-          : '18px',
+    '--school-card-radius': radiusValue,
+    '--school-control-radius': customization.radiusStyle === 'rounded' ? '999px' : radiusValue,
     '--school-card-border':
       template?.cardStyle === 'bordered'
         ? `${theme?.primary ?? '#0F2A5E'}26`
         : `${theme?.primary ?? '#0F2A5E'}18`,
     '--school-hero-align': template?.heroStyle === 'centered' ? 'center' : 'left',
     '--school-hero-max': template?.heroStyle === 'minimal' ? '640px' : '520px',
+    '--school-section-space': customization.density === 'compact' ? '32px' : '48px',
+    '--school-button-shadow':
+      customization.buttonStyle === 'soft'
+        ? `0 10px 24px ${theme?.primary ?? '#0F2A5E'}22`
+        : 'none',
+    '--school-outline-width': customization.contrast === 'high' ? '2px' : '1px',
   } as Record<string, string>
 })
 
@@ -215,9 +231,17 @@ function routeFor(name: string) {
 
 <style lang="scss" scoped>
 .school-layout {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   background: var(--school-surface);
   color: var(--school-text);
+}
+
+.page-content {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
@@ -423,6 +447,7 @@ function routeFor(name: string) {
 }
 
 .footer {
+  flex-shrink: 0;
   background: var(--school-primary);
   padding: 40px 0 32px;
   margin-top: 48px;

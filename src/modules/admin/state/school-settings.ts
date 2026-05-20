@@ -1,5 +1,5 @@
 import { computed, reactive } from 'vue'
-import { findSchoolBySlug } from '@/data/schools'
+import { getSchoolBySlugService } from '@/modules/schools/services/school-service'
 
 const STORAGE_KEY = 'school-pmr-admin-school-settings'
 
@@ -34,7 +34,7 @@ const state = reactive<{
 })
 
 function makeDefaultDraft(schoolSlug: string): SchoolSettingsDraft {
-  const school = findSchoolBySlug(schoolSlug)
+  const school = getSchoolBySlugService(schoolSlug)
 
   return {
     general: {
@@ -85,6 +85,10 @@ export function ensureSchoolSettingsDraft(schoolSlug: string) {
   }
 
   return state.drafts[schoolSlug]
+}
+
+export function peekSchoolSettingsDraft(schoolSlug: string) {
+  return state.drafts[schoolSlug] ?? null
 }
 
 export function getDefaultSchoolSettingsDraft(schoolSlug: string) {

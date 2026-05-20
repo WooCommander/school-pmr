@@ -6,7 +6,6 @@ import {
   documentCategoryLabels,
   documentStatusLabels,
 } from '@/data/documents'
-import { findSchoolBySlug } from '@/data/schools'
 import { useAdminAuth } from '@/modules/admin/state/admin-auth'
 import { getSchoolDocuments } from '@/modules/admin/state/school-documents'
 import { getSchoolNews } from '@/modules/admin/state/school-news'
@@ -15,6 +14,7 @@ import { ensureSchoolDesignDraft } from '@/modules/admin/state/school-design'
 import { ensureSchoolNavigationDraft } from '@/modules/admin/state/school-navigation'
 import { ensureSchoolModulesDraft } from '@/modules/admin/state/school-modules'
 import { ensureSchoolSettingsDraft } from '@/modules/admin/state/school-settings'
+import { getManagedSchoolBySlug } from '@/modules/schools/state/school-directory'
 
 type HistoryEntity = 'all' | 'news' | 'documents' | 'invites' | 'system'
 
@@ -34,7 +34,7 @@ const { currentUser } = useAdminAuth()
 const schoolSlug = computed(() =>
   typeof route.params.slug === 'string' ? route.params.slug : '',
 )
-const school = computed(() => findSchoolBySlug(schoolSlug.value))
+const school = computed(() => getManagedSchoolBySlug(schoolSlug.value))
 
 const entityFilter = ref<HistoryEntity>('all')
 const actorFilter = ref('all')

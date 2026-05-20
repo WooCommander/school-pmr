@@ -1,21 +1,23 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { schools } from '@/data/schools'
 import {
   getAdminRoleLabel,
   logoutAdmin,
   selectAdminSchool,
   useAdminAuth,
 } from '@/modules/admin/state/admin-auth'
+import { getManagedSchools } from '@/modules/schools/state/school-directory'
 
 const router = useRouter()
 const { currentUser } = useAdminAuth()
 
+const schools = computed(() => getManagedSchools())
+
 const availableSchools = computed(() =>
   (currentUser.value?.accesses ?? [])
     .map((access) => {
-      const school = schools.find((item) => item.slug === access.schoolSlug)
+      const school = schools.value.find((item) => item.slug === access.schoolSlug)
       return school
         ? {
             school,

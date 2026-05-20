@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { findSchoolBySlug } from '@/data/schools'
 import {
   ensureSchoolSettingsDraft,
   getDefaultSchoolSettingsDraft,
   resetSchoolGeneralDraft,
   updateSchoolGeneralDraft,
 } from '@/modules/admin/state/school-settings'
+import { getManagedSchoolBySlug } from '@/modules/schools/state/school-directory'
 
 const route = useRoute()
 
 const schoolSlug = computed(() =>
   typeof route.params.slug === 'string' ? route.params.slug : '',
 )
-const currentSchool = computed(() => findSchoolBySlug(schoolSlug.value))
+const currentSchool = computed(() => getManagedSchoolBySlug(schoolSlug.value))
 
 const generalDraft = computed(() => ensureSchoolSettingsDraft(schoolSlug.value).general)
 const defaultGeneral = computed(() => getDefaultSchoolSettingsDraft(schoolSlug.value).general)

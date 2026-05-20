@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import { findSchoolBySlug } from '@/data/schools'
 import { teachers } from '@/data/teachers'
 import {
   getAdminRoleForSchool,
@@ -14,6 +13,7 @@ import { getTemplatePresetByKey } from '@/modules/admin/data/template-presets'
 import { getThemePresetByKey } from '@/modules/admin/data/theme-presets'
 import { ensureSchoolDesignDraft } from '@/modules/admin/state/school-design'
 import { ensureSchoolSettingsDraft } from '@/modules/admin/state/school-settings'
+import { getManagedSchoolBySlug } from '@/modules/schools/state/school-directory'
 
 const route = useRoute()
 const { currentUser } = useAdminAuth()
@@ -22,7 +22,7 @@ const schoolSlug = computed(() =>
   typeof route.params.slug === 'string' ? route.params.slug : '',
 )
 
-const currentSchool = computed(() => findSchoolBySlug(schoolSlug.value))
+const currentSchool = computed(() => getManagedSchoolBySlug(schoolSlug.value))
 const currentRole = computed(() => getAdminRoleForSchool(schoolSlug.value))
 const currentRoleLabel = computed(() => getAdminRoleLabel(currentRole.value))
 const settingsDraft = computed(() => ensureSchoolSettingsDraft(schoolSlug.value))

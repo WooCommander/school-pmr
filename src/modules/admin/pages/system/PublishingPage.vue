@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { findSchoolBySlug } from '@/data/schools'
 import {
   ensureSchoolDesignDraft,
   publishSchoolDraftTemplate,
@@ -25,6 +24,7 @@ import {
 } from '@/modules/admin/state/school-settings'
 import { getTemplatePresetByKey } from '@/modules/admin/data/template-presets'
 import { getThemePresetByKey } from '@/modules/admin/data/theme-presets'
+import { getManagedSchoolBySlug } from '@/modules/schools/state/school-directory'
 
 const route = useRoute()
 
@@ -32,7 +32,7 @@ const schoolSlug = computed(() =>
   typeof route.params.slug === 'string' ? route.params.slug : '',
 )
 
-const school = computed(() => findSchoolBySlug(schoolSlug.value))
+const school = computed(() => getManagedSchoolBySlug(schoolSlug.value))
 const settingsDraft = computed(() => ensureSchoolSettingsDraft(schoolSlug.value))
 const designDraft = computed(() => ensureSchoolDesignDraft(schoolSlug.value))
 const navigationDraft = computed(() => ensureSchoolNavigationDraft(schoolSlug.value))

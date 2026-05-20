@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { findSchoolBySlug } from '@/data/schools'
 import {
   getAdminRoleForSchool,
   getAdminRoleLabel,
   logoutAdmin,
   useAdminAuth,
 } from '@/modules/admin/state/admin-auth'
+import { getManagedSchoolBySlug } from '@/modules/schools/state/school-directory'
 
 defineProps<{
   menuOpen?: boolean
@@ -25,7 +25,7 @@ const schoolSlug = computed(() =>
   typeof route.params.slug === 'string' ? route.params.slug : null,
 )
 const currentSchool = computed(() =>
-  schoolSlug.value ? findSchoolBySlug(schoolSlug.value) : null,
+  schoolSlug.value ? getManagedSchoolBySlug(schoolSlug.value) : null,
 )
 const role = computed(() =>
   schoolSlug.value ? getAdminRoleForSchool(schoolSlug.value) : null,

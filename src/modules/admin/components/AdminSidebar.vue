@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { findSchoolBySlug } from '@/data/schools'
+import { getManagedSchoolBySlug } from '@/modules/schools/state/school-directory'
 
 const props = defineProps<{
   open?: boolean
@@ -16,7 +16,7 @@ const route = useRoute()
 const schoolSlug = computed(() =>
   typeof route.params.slug === 'string' ? route.params.slug : 'demo-school',
 )
-const currentSchool = computed(() => findSchoolBySlug(schoolSlug.value))
+const currentSchool = computed(() => getManagedSchoolBySlug(schoolSlug.value))
 
 const sections = computed(() => [
   {

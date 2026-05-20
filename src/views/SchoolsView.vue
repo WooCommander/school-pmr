@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { schools } from '@/data/schools'
+import { computed } from 'vue'
+import { getManagedSchools } from '@/modules/schools/state/school-directory'
+
+const schools = computed(() => getManagedSchools())
 </script>
 
 <template>
