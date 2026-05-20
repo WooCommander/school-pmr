@@ -59,7 +59,7 @@ function createDefaultItems(): SchoolModuleItem[] {
     {
       key: 'documents',
       title: 'Документы',
-      description: 'Публичные документы, локальные акты и отчеты.',
+      description: 'Публичные документы, локальные акты и отчёты.',
       enabled: true,
     },
     {
@@ -112,6 +112,10 @@ export function ensureSchoolModulesDraft(schoolSlug: string) {
   }
 
   return state.drafts[schoolSlug]
+}
+
+export function getDefaultSchoolModulesDraft() {
+  return makeDefaultDraft()
 }
 
 export function updateSchoolModulesDraft(schoolSlug: string, items: SchoolModuleItem[]) {

@@ -1,133 +1,136 @@
-export interface Document {
+export type DocumentCategory =
+  | 'charter'
+  | 'curriculum'
+  | 'local-act'
+  | 'report'
+  | 'admission'
+export type DocumentStatus = 'draft' | 'published'
+
+export interface DocumentItem {
   id: number
   schoolSlug: string
   title: string
-  category: string
+  category: DocumentCategory
+  description: string
   date: string
   size: string
   url: string
+  status: DocumentStatus
+  updatedAt: string
 }
 
-export const documentCategories = [
-  'Все',
-  'Устав и лицензии',
-  'Учебные планы',
-  'Локальные акты',
-  'Отчеты',
-]
+export const documentCategoryLabels: Record<DocumentCategory, string> = {
+  charter: 'Устав и лицензии',
+  curriculum: 'Учебные планы',
+  'local-act': 'Локальные акты',
+  report: 'Отчеты',
+  admission: 'Прием и заявления',
+}
 
-export const documents: Document[] = [
+export const documentStatusLabels: Record<DocumentStatus, string> = {
+  draft: 'Черновик',
+  published: 'Опубликовано',
+}
+
+export const seedDocuments: DocumentItem[] = [
   {
     id: 1,
     schoolSlug: 'dnestrovsk-school-1',
-    title: 'Устав школы (редакция 2024)',
-    category: 'Устав и лицензии',
-    date: '2024-09-01',
+    title: 'Устав школы, редакция 2026 года',
+    category: 'charter',
+    description: 'Актуальная редакция устава для родителей, сотрудников и проверяющих органов.',
+    date: '2026-01-15',
     size: '1.2 МБ',
     url: '#',
+    status: 'published',
+    updatedAt: '2026-01-15T09:00:00',
   },
   {
     id: 2,
     schoolSlug: 'dnestrovsk-school-1',
     title: 'Лицензия на образовательную деятельность',
-    category: 'Устав и лицензии',
-    date: '2023-06-15',
-    size: '0.8 МБ',
+    category: 'charter',
+    description: 'Скан лицензии с реквизитами и сроком действия.',
+    date: '2025-09-01',
+    size: '820 КБ',
     url: '#',
+    status: 'published',
+    updatedAt: '2025-09-01T11:20:00',
   },
   {
     id: 3,
     schoolSlug: 'dnestrovsk-school-1',
-    title: 'Учебный план 2025–2026 (1–4 кл.)',
-    category: 'Учебные планы',
-    date: '2025-08-28',
-    size: '0.5 МБ',
+    title: 'Учебный план на 2026–2027 учебный год',
+    category: 'curriculum',
+    description: 'Нагрузка по уровням обучения и профилям классов.',
+    date: '2026-05-10',
+    size: '540 КБ',
     url: '#',
+    status: 'published',
+    updatedAt: '2026-05-10T08:45:00',
   },
   {
     id: 4,
     schoolSlug: 'dnestrovsk-school-1',
-    title: 'Правила внутреннего распорядка учащихся',
-    category: 'Локальные акты',
-    date: '2025-09-01',
-    size: '0.3 МБ',
+    title: 'Положение о школьном сайте',
+    category: 'local-act',
+    description: 'Правила публикации материалов и ответственности за контент.',
+    date: '2026-04-18',
+    size: '260 КБ',
     url: '#',
+    status: 'draft',
+    updatedAt: '2026-05-19T16:10:00',
   },
   {
     id: 5,
-    schoolSlug: 'dnestrovsk-school-1',
-    title: 'Самообследование школы 2024–2025',
-    category: 'Отчеты',
-    date: '2025-05-30',
-    size: '2.1 МБ',
+    schoolSlug: 'school-2',
+    title: 'Публичный отчет школы за 2025 год',
+    category: 'report',
+    description: 'Основные показатели, достижения и результаты самооценки.',
+    date: '2026-03-12',
+    size: '1.4 МБ',
     url: '#',
+    status: 'published',
+    updatedAt: '2026-03-12T14:30:00',
   },
   {
     id: 6,
     schoolSlug: 'school-2',
-    title: 'Устав ТСШ №2',
-    category: 'Устав и лицензии',
-    date: '2024-09-05',
-    size: '1.0 МБ',
+    title: 'Заявление на прием в 1 класс',
+    category: 'admission',
+    description: 'Форма для родителей будущих первоклассников.',
+    date: '2026-05-01',
+    size: '190 КБ',
     url: '#',
+    status: 'published',
+    updatedAt: '2026-05-01T10:15:00',
   },
   {
     id: 7,
-    schoolSlug: 'school-2',
-    title: 'Учебный план ТСШ №2 на 2025–2026 год',
-    category: 'Учебные планы',
-    date: '2025-08-29',
-    size: '0.6 МБ',
+    schoolSlug: 'school-3',
+    title: 'Правила внутреннего распорядка',
+    category: 'local-act',
+    description: 'Документ для учащихся и родителей по режиму школы.',
+    date: '2026-02-20',
+    size: '310 КБ',
     url: '#',
+    status: 'published',
+    updatedAt: '2026-02-20T09:40:00',
   },
   {
     id: 8,
-    schoolSlug: 'school-3',
-    title: 'Лицензия ТСШ №3',
-    category: 'Устав и лицензии',
-    date: '2024-06-12',
-    size: '0.7 МБ',
-    url: '#',
-  },
-  {
-    id: 9,
-    schoolSlug: 'school-3',
-    title: 'Публичный отчет школы за 2024 год',
-    category: 'Отчеты',
-    date: '2025-03-01',
-    size: '1.4 МБ',
-    url: '#',
-  },
-  {
-    id: 10,
-    schoolSlug: 'school-4',
-    title: 'Положение об использовании мобильных телефонов',
-    category: 'Локальные акты',
-    date: '2025-09-01',
-    size: '0.2 МБ',
-    url: '#',
-  },
-  {
-    id: 11,
     schoolSlug: 'lyceum-1',
-    title: 'Устав лицея №1',
-    category: 'Устав и лицензии',
-    date: '2024-10-01',
-    size: '1.1 МБ',
+    title: 'Пакет документов для поступления в профильные классы',
+    category: 'admission',
+    description: 'Перечень обязательных заявлений и справок.',
+    date: '2026-05-11',
+    size: '470 КБ',
     url: '#',
-  },
-  {
-    id: 12,
-    schoolSlug: 'lyceum-1',
-    title: 'Учебный план лицея №1',
-    category: 'Учебные планы',
-    date: '2025-08-28',
-    size: '0.7 МБ',
-    url: '#',
+    status: 'published',
+    updatedAt: '2026-05-11T12:25:00',
   },
 ]
 
-export function getDocumentsBySchool(schoolSlug: string) {
-  const schoolDocuments = documents.filter((document) => document.schoolSlug === schoolSlug)
-  return schoolDocuments.length ? schoolDocuments : documents.filter((document) => document.schoolSlug === 'dnestrovsk-school-1')
+export function cloneSeedDocuments() {
+  return seedDocuments.map((item) => ({ ...item }))
 }

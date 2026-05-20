@@ -15,10 +15,41 @@ interface AdminSessionState {
   selectedSchoolSlug: string | null
 }
 
+export const adminRoleLabels: Record<AdminRole, string> = {
+  superadmin: 'Системный администратор',
+  school_admin: 'Администратор школы',
+  director: 'Директор',
+  content_manager: 'Контент-менеджер',
+}
+
 const state = reactive<AdminSessionState>({
   user: null,
   selectedSchoolSlug: null,
 })
+
+function getDefaultSchoolSlug(user: AdminSessionUser | null) {
+  if (!user) {
+    return null
+  }
+
+  return user.accesses.length === 1 ? user.accesses[0].schoolSlug : null
+}
+
+function normalizeSelectedSchool() {
+  if (!state.user) {
+    state.selectedSchoolSlug = null
+    return
+  }
+
+  if (
+    state.selectedSchoolSlug &&
+    state.user.accesses.some((access) => access.schoolSlug === state.selectedSchoolSlug)
+  ) {
+    return
+  }
+
+  state.selectedSchoolSlug = getDefaultSchoolSlug(state.user)
+}
 
 function loadSession() {
   if (typeof window === 'undefined') return
@@ -30,6 +61,7 @@ function loadSession() {
     const parsed = JSON.parse(raw) as AdminSessionState
     state.user = parsed.user
     state.selectedSchoolSlug = parsed.selectedSchoolSlug
+    normalizeSelectedSchool()
   } catch {
     window.localStorage.removeItem(STORAGE_KEY)
   }
@@ -38,17 +70,26 @@ function loadSession() {
 function persistSession() {
   if (typeof window === 'undefined') return
 
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    user: state.user,
-    selectedSchoolSlug: state.selectedSchoolSlug,
-  }))
+  window.localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify({
+      user: state.user,
+      selectedSchoolSlug: state.selectedSchoolSlug,
+    }),
+  )
 }
 
 loadSession()
 
 export function loginAdmin(email: string, password: string) {
-  const user = mockAdminUsers.find((item) => item.email === email && item.password === password)
-  if (!user) return { ok: false as const, error: 'Неверный email или пароль.' }
+  const normalizedEmail = email.trim().toLowerCase()
+  const user = mockAdminUsers.find(
+    (item) => item.email.toLowerCase() === normalizedEmail && item.password === password,
+  )
+
+  if (!user) {
+    return { ok: false as const, error: 'Неверный email или пароль.' }
+  }
 
   state.user = {
     id: user.id,
@@ -56,7 +97,7 @@ export function loginAdmin(email: string, password: string) {
     name: user.name,
     accesses: user.accesses,
   }
-  state.selectedSchoolSlug = user.accesses.length === 1 ? user.accesses[0].schoolSlug : null
+  state.selectedSchoolSlug = getDefaultSchoolSlug(state.user)
   persistSession()
 
   return { ok: true as const }
@@ -69,8 +110,13 @@ export function logoutAdmin() {
 }
 
 export function selectAdminSchool(schoolSlug: string) {
+  if (!hasAdminAccessToSchool(schoolSlug)) {
+    return false
+  }
+
   state.selectedSchoolSlug = schoolSlug
   persistSession()
+  return true
 }
 
 export function hasAdminAccessToSchool(schoolSlug: string) {
@@ -81,11 +127,16 @@ export function getAdminRoleForSchool(schoolSlug: string): AdminRole | null {
   return state.user?.accesses.find((access) => access.schoolSlug === schoolSlug)?.role ?? null
 }
 
+export function getAdminRoleLabel(role: AdminRole | null) {
+  return role ? adminRoleLabels[role] ?? role : null
+}
+
 export function useAdminAuth() {
   return {
     state,
     isAuthenticated: computed(() => !!state.user),
     currentUser: computed(() => state.user),
     selectedSchoolSlug: computed(() => state.selectedSchoolSlug),
+    availableAccesses: computed(() => state.user?.accesses ?? []),
   }
 }

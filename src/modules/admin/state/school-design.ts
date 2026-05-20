@@ -88,6 +88,10 @@ export function ensureSchoolDesignDraft(schoolSlug: string) {
   return state.drafts[schoolSlug]
 }
 
+export function getDefaultSchoolDesignDraft(schoolSlug: string) {
+  return makeDefaultDraft(schoolSlug)
+}
+
 export function updateSchoolDraftTemplate(schoolSlug: string, templateKey: TemplateKey) {
   ensureSchoolDesignDraft(schoolSlug)
   state.drafts[schoolSlug].draftTemplateKey = templateKey

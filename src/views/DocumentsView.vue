@@ -1,21 +1,36 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { getDocumentsBySchool, documentCategories } from '@/data/documents'
+import { computed, ref } from 'vue'
+import {
+  documentCategoryLabels,
+  type DocumentCategory,
+} from '@/data/documents'
 import { useCurrentSchool } from '@/composables/useCurrentSchool'
+import { getPublishedSchoolDocuments } from '@/modules/admin/state/school-documents'
 
 const { school } = useCurrentSchool()
-const activeCategory = ref('Все')
+const activeCategory = ref<'all' | DocumentCategory>('all')
 
-const schoolDocuments = computed(() => getDocumentsBySchool(school.value.slug))
+const schoolDocuments = computed(() => getPublishedSchoolDocuments(school.value.slug))
+const categories = computed(() => [
+  { key: 'all' as const, label: 'Все' },
+  ...Object.entries(documentCategoryLabels).map(([key, label]) => ({
+    key: key as DocumentCategory,
+    label,
+  })),
+])
 
 const filtered = computed(() =>
-  activeCategory.value === 'Все'
+  activeCategory.value === 'all'
     ? schoolDocuments.value
-    : schoolDocuments.value.filter(d => d.category === activeCategory.value)
+    : schoolDocuments.value.filter((document) => document.category === activeCategory.value),
 )
 
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+function formatDate(date: string) {
+  return new Date(date).toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
 }
 </script>
 
@@ -23,19 +38,19 @@ function formatDate(d: string) {
   <div class="section">
     <div class="container">
       <h1 class="page-title">Документы</h1>
-      <p class="page-subtitle">Нормативные и локальные акты школы</p>
+      <p class="page-subtitle">Нормативные и локальные акты школы, доступные для скачивания</p>
 
       <div class="tabs" role="tablist">
         <button
-          v-for="cat in documentCategories"
-          :key="cat"
+          v-for="category in categories"
+          :key="category.key"
           class="tab"
-          :class="{ 'tab--active': activeCategory === cat }"
+          :class="{ 'tab--active': activeCategory === category.key }"
           role="tab"
-          :aria-selected="activeCategory === cat"
-          @click="activeCategory = cat"
+          :aria-selected="activeCategory === category.key"
+          @click="activeCategory = category.key"
         >
-          {{ cat }}
+          {{ category.label }}
         </button>
       </div>
 
@@ -50,8 +65,9 @@ function formatDate(d: string) {
           </div>
           <div class="doc-item__body">
             <p class="doc-item__title">{{ doc.title }}</p>
+            <p class="doc-item__description">{{ doc.description }}</p>
             <div class="doc-item__meta">
-              <span class="doc-item__category">{{ doc.category }}</span>
+              <span class="doc-item__category">{{ documentCategoryLabels[doc.category] }}</span>
               <span class="doc-item__date">{{ formatDate(doc.date) }}</span>
               <span class="doc-item__size">{{ doc.size }}</span>
             </div>
@@ -62,7 +78,7 @@ function formatDate(d: string) {
           </a>
         </div>
         <div v-if="filtered.length === 0" class="empty-state">
-          <p>Документов в этой категории нет.</p>
+          <p>В этой категории пока нет опубликованных документов.</p>
         </div>
       </div>
     </div>
@@ -82,7 +98,10 @@ function formatDate(d: string) {
     overflow-x: auto;
     flex-wrap: nowrap;
     scrollbar-width: none;
-    &::-webkit-scrollbar { display: none; }
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 
@@ -98,7 +117,9 @@ function formatDate(d: string) {
   white-space: nowrap;
   transition: all $transition-fast;
 
-  &:hover { color: $navy; }
+  &:hover {
+    color: $navy;
+  }
 
   &--active {
     color: $navy;
@@ -123,7 +144,9 @@ function formatDate(d: string) {
   padding: 16px 18px;
   transition: box-shadow $transition-base;
 
-  &:hover { box-shadow: 0 2px 12px rgba($navy, .07); }
+  &:hover {
+    box-shadow: 0 2px 12px rgba($navy, .07);
+  }
 
   @media (max-width: $mobile-breakpoint) {
     flex-wrap: wrap;
@@ -154,6 +177,12 @@ function formatDate(d: string) {
   margin-bottom: 6px;
 }
 
+.doc-item__description {
+  color: $text-secondary;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
 .doc-item__meta {
   display: flex;
   flex-wrap: wrap;
@@ -169,11 +198,7 @@ function formatDate(d: string) {
   border-radius: 12px;
 }
 
-.doc-item__date {
-  font-size: 12px;
-  color: $text-muted;
-}
-
+.doc-item__date,
 .doc-item__size {
   font-size: 12px;
   color: $text-muted;
@@ -194,6 +219,9 @@ function formatDate(d: string) {
   transition: all $transition-fast;
   flex-shrink: 0;
 
-  &:hover { background: $navy; color: $white; }
+  &:hover {
+    background: $navy;
+    color: $white;
+  }
 }
 </style>

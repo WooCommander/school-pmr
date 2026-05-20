@@ -11,19 +11,22 @@ import {
 const route = useRoute()
 
 const schoolSlug = computed(() =>
-  typeof route.params.slug === 'string' ? route.params.slug : ''
+  typeof route.params.slug === 'string' ? route.params.slug : '',
 )
 
 const modulesDraft = computed(() => ensureSchoolModulesDraft(schoolSlug.value))
 const draftItems = computed(() => modulesDraft.value.draftItems)
 const publishedItems = computed(() => modulesDraft.value.publishedItems)
+const hasUnpublishedChanges = computed(
+  () => JSON.stringify(draftItems.value) !== JSON.stringify(publishedItems.value),
+)
 
 const statusMessage = ref('')
 const statusTone = ref<'idle' | 'success'>('idle')
 
 function toggleModule(moduleKey: string) {
   const nextItems = draftItems.value.map((item) =>
-    item.key === moduleKey ? { ...item, enabled: !item.enabled } : item
+    item.key === moduleKey ? { ...item, enabled: !item.enabled } : item,
   )
   updateSchoolModulesDraft(schoolSlug.value, nextItems)
 }
@@ -31,7 +34,7 @@ function toggleModule(moduleKey: string) {
 function resetDraft() {
   resetSchoolModulesDraft(schoolSlug.value)
   statusTone.value = 'success'
-  statusMessage.value = 'Черновик модулей возвращен к опубликованной версии.'
+  statusMessage.value = 'Черновик модулей возвращён к опубликованной версии.'
 }
 
 function publishDraft() {
@@ -57,8 +60,12 @@ function isPublishedEnabled(moduleKey: string) {
       </div>
 
       <div class="modules-page__actions">
-        <button class="btn btn--outline" @click="resetDraft">Сбросить черновик</button>
-        <button class="btn btn--primary" @click="publishDraft">Опубликовать модули</button>
+        <button class="btn btn--outline" :disabled="!hasUnpublishedChanges" @click="resetDraft">
+          Сбросить черновик
+        </button>
+        <button class="btn btn--primary" :disabled="!hasUnpublishedChanges" @click="publishDraft">
+          Опубликовать модули
+        </button>
       </div>
     </div>
 
@@ -89,8 +96,14 @@ function isPublishedEnabled(moduleKey: string) {
                 <h3>{{ item.title }}</h3>
                 <p>{{ item.description }}</p>
                 <div class="module-item__meta">
-                  <span>Опубликовано: {{ isPublishedEnabled(item.key) ? 'включено' : 'отключено' }}</span>
-                  <span>Черновик: {{ item.enabled ? 'включен' : 'отключен' }}</span>
+                  <span>
+                    Опубликовано:
+                    {{ isPublishedEnabled(item.key) ? 'включено' : 'отключено' }}
+                  </span>
+                  <span>
+                    Черновик:
+                    {{ item.enabled ? 'включен' : 'отключен' }}
+                  </span>
                 </div>
               </div>
 
@@ -110,12 +123,33 @@ function isPublishedEnabled(moduleKey: string) {
       <aside class="modules-page__side">
         <section class="modules-card">
           <div class="modules-card__header">
+            <h2>Состояние</h2>
+          </div>
+
+          <dl class="summary-list">
+            <div>
+              <dt>Черновик отличается</dt>
+              <dd>{{ hasUnpublishedChanges ? 'Да' : 'Нет' }}</dd>
+            </div>
+            <div>
+              <dt>Активно в черновике</dt>
+              <dd>{{ draftItems.filter((item) => item.enabled).length }}</dd>
+            </div>
+            <div>
+              <dt>Активно опубликовано</dt>
+              <dd>{{ publishedItems.filter((item) => item.enabled).length }}</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="modules-card">
+          <div class="modules-card__header">
             <h2>Что происходит после публикации</h2>
           </div>
 
           <ul class="check-list">
             <li>раздел исчезает из публичного меню школы</li>
-            <li>маршрут раздела становится недоступен и ведет на главную школы</li>
+            <li>маршрут раздела становится недоступен и ведёт на главную школы</li>
             <li>админские данные при этом не удаляются</li>
             <li>модуль можно включить обратно в любой момент</li>
           </ul>
@@ -286,6 +320,33 @@ function isPublishedEnabled(moduleKey: string) {
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
+}
+
+.summary-list {
+  display: grid;
+  gap: 10px;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    border-top: 1px solid $border;
+    padding-top: 10px;
+  }
+
+  dt {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: $text-secondary;
+  }
+
+  dd {
+    margin: 0;
+    color: $text-primary;
+    font-weight: 500;
+    text-align: right;
+  }
 }
 
 .check-list {

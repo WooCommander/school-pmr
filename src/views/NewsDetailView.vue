@@ -1,24 +1,35 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { news, categoryLabels } from '@/data/news'
+import { categoryLabels } from '@/data/news'
+import { getPublishedSchoolNewsItem } from '@/modules/admin/state/school-news'
 
 const route = useRoute()
 const router = useRouter()
 
+const schoolSlug = computed(() =>
+  typeof route.params.slug === 'string' ? route.params.slug : '',
+)
 const item = computed(() =>
-  news.find(n => n.id === Number(route.params.id))
+  getPublishedSchoolNewsItem(schoolSlug.value, Number(route.params.id)),
 )
 
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+  return new Date(d).toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
 }
 </script>
 
 <template>
   <div class="section">
     <div class="container">
-      <button class="back-btn" @click="router.push({ name: 'school-news', params: { slug: route.params.slug } })">
+      <button
+        class="back-btn"
+        @click="router.push({ name: 'school-news', params: { slug: route.params.slug } })"
+      >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
         Все новости
       </button>
@@ -39,7 +50,11 @@ function formatDate(d: string) {
 
       <div v-else class="empty-state">
         <p>Новость не найдена.</p>
-        <router-link :to="{ name: 'school-news', params: { slug: route.params.slug } }" class="btn btn--outline" style="margin-top:16px;display:inline-flex">
+        <router-link
+          :to="{ name: 'school-news', params: { slug: route.params.slug } }"
+          class="btn btn--outline"
+          style="margin-top:16px;display:inline-flex"
+        >
           К списку новостей
         </router-link>
       </div>

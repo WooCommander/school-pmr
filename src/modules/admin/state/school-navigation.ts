@@ -104,6 +104,10 @@ export function ensureSchoolNavigationDraft(schoolSlug: string) {
   return state.drafts[schoolSlug]
 }
 
+export function getDefaultSchoolNavigationDraft() {
+  return makeDefaultDraft()
+}
+
 export function updateSchoolNavigationDraft(schoolSlug: string, items: SchoolNavigationItem[]) {
   ensureSchoolNavigationDraft(schoolSlug)
   state.drafts[schoolSlug].draftItems = normalizeItems(items)
@@ -131,10 +135,10 @@ export function useSchoolNavigationDraft(schoolSlug: string) {
 
   return {
     draftItems: computed(() =>
-      normalizeItems(ensureSchoolNavigationDraft(schoolSlug).draftItems)
+      normalizeItems(ensureSchoolNavigationDraft(schoolSlug).draftItems),
     ),
     publishedItems: computed(() =>
-      normalizeItems(ensureSchoolNavigationDraft(schoolSlug).publishedItems)
+      normalizeItems(ensureSchoolNavigationDraft(schoolSlug).publishedItems),
     ),
   }
 }

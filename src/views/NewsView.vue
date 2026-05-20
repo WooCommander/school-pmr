@@ -1,11 +1,19 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import NewsCard from '@/components/NewsCard.vue'
-import { news, categoryLabels, type NewsItem } from '@/data/news'
+import { categoryLabels, type NewsItem } from '@/data/news'
+import { getPublishedSchoolNews } from '@/modules/admin/state/school-news'
 
 type Category = NewsItem['category'] | 'all'
 
+const route = useRoute()
 const activeCategory = ref<Category>('all')
+
+const schoolSlug = computed(() =>
+  typeof route.params.slug === 'string' ? route.params.slug : '',
+)
+const schoolNews = computed(() => getPublishedSchoolNews(schoolSlug.value))
 
 const categories: { key: Category; label: string }[] = [
   { key: 'all', label: 'Все' },
@@ -17,8 +25,8 @@ const categories: { key: Category; label: string }[] = [
 
 const filtered = computed(() =>
   activeCategory.value === 'all'
-    ? news
-    : news.filter(n => n.category === activeCategory.value)
+    ? schoolNews.value
+    : schoolNews.value.filter((n) => n.category === activeCategory.value),
 )
 </script>
 

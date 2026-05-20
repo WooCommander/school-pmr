@@ -2,70 +2,139 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { schools } from '@/data/schools'
-import { selectAdminSchool, useAdminAuth } from '@/modules/admin/state/admin-auth'
+import {
+  getAdminRoleLabel,
+  logoutAdmin,
+  selectAdminSchool,
+  useAdminAuth,
+} from '@/modules/admin/state/admin-auth'
 
 const router = useRouter()
 const { currentUser } = useAdminAuth()
 
 const availableSchools = computed(() =>
-  (currentUser.value?.accesses ?? []).map((access) => {
-    const school = schools.find((item) => item.slug === access.schoolSlug)
-    return school ? { school, role: access.role } : null
-  }).filter(Boolean)
+  (currentUser.value?.accesses ?? [])
+    .map((access) => {
+      const school = schools.find((item) => item.slug === access.schoolSlug)
+      return school
+        ? {
+            school,
+            role: access.role,
+            roleLabel: getAdminRoleLabel(access.role),
+          }
+        : null
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null),
 )
 
 async function openSchool(schoolSlug: string) {
-  selectAdminSchool(schoolSlug)
+  const isSelected = selectAdminSchool(schoolSlug)
+  if (!isSelected) {
+    return
+  }
+
   await router.push({ name: 'admin-school-dashboard', params: { slug: schoolSlug } })
+}
+
+async function signOut() {
+  logoutAdmin()
+  await router.push({ name: 'admin-login' })
 }
 </script>
 
 <template>
   <div class="select-school-page">
     <div class="select-school-page__header">
-      <h1>Выбор школы</h1>
-      <p>Выберите кабинет школы, в котором хотите работать.</p>
+      <div>
+        <p class="select-school-page__eyebrow">Выбор кабинета</p>
+        <h1>Выберите школу</h1>
+        <p>
+          {{ currentUser?.name }}, выберите кабинет школы, в котором хотите работать.
+        </p>
+      </div>
+
+      <button class="select-school-page__logout" type="button" @click="signOut">
+        Выйти
+      </button>
     </div>
 
-    <div class="select-school-page__grid">
+    <div v-if="availableSchools.length" class="select-school-page__grid">
       <button
         v-for="item in availableSchools"
-        :key="item!.school.slug"
+        :key="item.school.slug"
         class="school-card"
-        @click="openSchool(item!.school.slug)"
+        type="button"
+        @click="openSchool(item.school.slug)"
       >
         <div class="school-card__top">
-          <span class="school-card__badge">{{ item!.school.shortName }}</span>
-          <span class="school-card__role">{{ item!.role }}</span>
+          <span class="school-card__badge">{{ item.school.shortName }}</span>
+          <span class="school-card__role">{{ item.roleLabel }}</span>
         </div>
-        <h2>{{ item!.school.fullName }}</h2>
-        <p>{{ item!.school.address }}</p>
+
+        <h2>{{ item.school.fullName }}</h2>
+        <p class="school-card__city">{{ item.school.city }}</p>
+        <p>{{ item.school.address }}</p>
         <span class="school-card__link">Открыть кабинет</span>
       </button>
+    </div>
+
+    <div v-else class="select-school-page__empty">
+      <h2>Нет доступных школ</h2>
+      <p>Для этого пользователя пока не назначены роли в школах.</p>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .select-school-page {
+  min-height: 100vh;
   padding: 40px 24px;
+  background: $surface;
 }
 
 .select-school-page__header {
-  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 auto 24px;
+  max-width: 1180px;
+
+  @media (max-width: 720px) {
+    flex-direction: column;
+  }
 
   h1 {
-    font-size: 28px;
+    font-size: 30px;
     color: $text-primary;
   }
 
   p {
     margin-top: 10px;
     color: $text-secondary;
+    line-height: 1.6;
   }
 }
 
+.select-school-page__eyebrow {
+  margin-top: 0 !important;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: $navy;
+}
+
+.select-school-page__logout {
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: $white;
+  border: 1px solid $border;
+  color: $text-primary;
+}
+
 .select-school-page__grid {
+  max-width: 1180px;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
@@ -77,10 +146,11 @@ async function openSchool(schoolSlug: string) {
   border: 1px solid $border;
   border-radius: $radius-lg;
   padding: 20px;
-  transition: transform $transition-base, box-shadow $transition-base;
+  transition: transform $transition-base, box-shadow $transition-base, border-color $transition-base;
 
   &:hover {
     transform: translateY(-2px);
+    border-color: rgba($navy, .22);
     box-shadow: 0 8px 24px rgba($navy, .08);
   }
 
@@ -101,7 +171,7 @@ async function openSchool(schoolSlug: string) {
 
 .school-card__top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
 }
@@ -118,7 +188,12 @@ async function openSchool(schoolSlug: string) {
 .school-card__role {
   font-size: 12px;
   color: $text-muted;
-  text-transform: uppercase;
+  text-align: right;
+}
+
+.school-card__city {
+  color: $text-primary !important;
+  font-weight: 600;
 }
 
 .school-card__link {
@@ -127,5 +202,25 @@ async function openSchool(schoolSlug: string) {
   color: $navy;
   font-size: 14px;
   font-weight: 600;
+}
+
+.select-school-page__empty {
+  max-width: 640px;
+  margin: 40px auto 0;
+  padding: 24px;
+  border-radius: $radius-lg;
+  background: $white;
+  border: 1px solid $border;
+
+  h2 {
+    font-size: 20px;
+    color: $text-primary;
+  }
+
+  p {
+    margin-top: 10px;
+    color: $text-secondary;
+    line-height: 1.6;
+  }
 }
 </style>

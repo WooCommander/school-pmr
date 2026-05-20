@@ -20,7 +20,8 @@ export const templatePresets: TemplatePreset[] = [
   {
     key: 'classic',
     name: 'Классический',
-    description: 'Спокойная школьная подача с привычной структурой и акцентом на официальные разделы.',
+    description:
+      'Спокойная школьная подача с привычной структурой и акцентом на официальные разделы.',
     badge: 'Универсальный',
     menuStyle: 'top',
     heroStyle: 'large',
@@ -30,7 +31,8 @@ export const templatePresets: TemplatePreset[] = [
   {
     key: 'modern',
     name: 'Современный',
-    description: 'Более динамичная главная страница с акцентом на быстрый доступ и визуальные блоки.',
+    description:
+      'Более динамичная главная страница с акцентом на быстрый доступ и визуальные блоки.',
     badge: 'Рекомендуем',
     menuStyle: 'split',
     heroStyle: 'centered',
@@ -40,7 +42,8 @@ export const templatePresets: TemplatePreset[] = [
   {
     key: 'academic',
     name: 'Академический',
-    description: 'Строгий вариант для лицеев и школ, где важны программа, достижения и официальный тон.',
+    description:
+      'Строгий вариант для лицеев и школ, где важны программа, достижения и официальный тон.',
     badge: 'Строгий',
     menuStyle: 'top',
     heroStyle: 'minimal',
@@ -50,7 +53,8 @@ export const templatePresets: TemplatePreset[] = [
   {
     key: 'media',
     name: 'Медиа-акцент',
-    description: 'Шаблон с более живой главной страницей, галереей и активным новостным блоком.',
+    description:
+      'Шаблон с более живой главной страницей, галереей и активным новостным блоком.',
     badge: 'Для активности',
     menuStyle: 'split',
     heroStyle: 'large',
@@ -60,7 +64,8 @@ export const templatePresets: TemplatePreset[] = [
   {
     key: 'compact',
     name: 'Компактный',
-    description: 'Плотная и практичная структура для школ, которым нужен короткий путь к разделам.',
+    description:
+      'Плотная и практичная структура для школ, которым нужен короткий путь к разделам.',
     badge: 'Компактный',
     menuStyle: 'compact',
     heroStyle: 'minimal',

@@ -12,13 +12,18 @@ import {
 const route = useRoute()
 
 const schoolSlug = computed(() =>
-  typeof route.params.slug === 'string' ? route.params.slug : ''
+  typeof route.params.slug === 'string' ? route.params.slug : '',
 )
 
 const navigationDraft = computed(() => ensureSchoolNavigationDraft(schoolSlug.value))
-const draftItems = computed(() => navigationDraft.value.draftItems.slice().sort((a, b) => a.order - b.order))
+const draftItems = computed(() =>
+  navigationDraft.value.draftItems.slice().sort((a, b) => a.order - b.order),
+)
 const publishedItems = computed(() =>
-  navigationDraft.value.publishedItems.slice().sort((a, b) => a.order - b.order)
+  navigationDraft.value.publishedItems.slice().sort((a, b) => a.order - b.order),
+)
+const hasUnpublishedChanges = computed(
+  () => JSON.stringify(draftItems.value) !== JSON.stringify(publishedItems.value),
 )
 
 const statusMessage = ref('')
@@ -30,14 +35,14 @@ function saveItems(items: SchoolNavigationItem[]) {
 
 function updateLabel(itemKey: string, value: string) {
   const nextItems = draftItems.value.map((item) =>
-    item.key === itemKey ? { ...item, label: value } : item
+    item.key === itemKey ? { ...item, label: value } : item,
   )
   saveItems(nextItems)
 }
 
 function toggleVisibility(itemKey: string) {
   const nextItems = draftItems.value.map((item) =>
-    item.key === itemKey ? { ...item, visible: !item.visible } : item
+    item.key === itemKey ? { ...item, visible: !item.visible } : item,
   )
   saveItems(nextItems)
 }
@@ -57,7 +62,7 @@ function moveItem(itemKey: string, direction: 'up' | 'down') {
 function resetDraft() {
   resetSchoolNavigationDraft(schoolSlug.value)
   statusTone.value = 'success'
-  statusMessage.value = 'Черновик меню возвращен к опубликованной версии.'
+  statusMessage.value = 'Черновик меню возвращён к опубликованной версии.'
 }
 
 function publishDraft() {
@@ -68,6 +73,10 @@ function publishDraft() {
 
 function publishedLabel(itemKey: string) {
   return publishedItems.value.find((item) => item.key === itemKey)?.label ?? '—'
+}
+
+function publishedVisibility(itemKey: string) {
+  return publishedItems.value.find((item) => item.key === itemKey)?.visible ?? true
 }
 </script>
 
@@ -83,8 +92,12 @@ function publishedLabel(itemKey: string) {
       </div>
 
       <div class="navigation-page__actions">
-        <button class="btn btn--outline" @click="resetDraft">Сбросить черновик</button>
-        <button class="btn btn--primary" @click="publishDraft">Опубликовать меню</button>
+        <button class="btn btn--outline" :disabled="!hasUnpublishedChanges" @click="resetDraft">
+          Сбросить черновик
+        </button>
+        <button class="btn btn--primary" :disabled="!hasUnpublishedChanges" @click="publishDraft">
+          Опубликовать меню
+        </button>
       </div>
     </div>
 
@@ -127,15 +140,15 @@ function publishedLabel(itemKey: string) {
                 <div class="navigation-item__meta">
                   <span>Маршрут: {{ item.routeName }}</span>
                   <span>Опубликовано как: {{ publishedLabel(item.key) }}</span>
+                  <span>
+                    Публикация:
+                    {{ publishedVisibility(item.key) ? 'видим' : 'скрыт' }}
+                  </span>
                 </div>
               </div>
 
               <div class="navigation-item__controls">
-                <button
-                  class="icon-btn"
-                  :disabled="index === 0"
-                  @click="moveItem(item.key, 'up')"
-                >
+                <button class="icon-btn" :disabled="index === 0" @click="moveItem(item.key, 'up')">
                   ↑
                 </button>
                 <button
@@ -160,6 +173,27 @@ function publishedLabel(itemKey: string) {
       </div>
 
       <aside class="navigation-page__side">
+        <section class="navigation-card">
+          <div class="navigation-card__header">
+            <h2>Состояние</h2>
+          </div>
+
+          <dl class="summary-list">
+            <div>
+              <dt>Черновик отличается</dt>
+              <dd>{{ hasUnpublishedChanges ? 'Да' : 'Нет' }}</dd>
+            </div>
+            <div>
+              <dt>Видимых пунктов</dt>
+              <dd>{{ draftItems.filter((item) => item.visible).length }}</dd>
+            </div>
+            <div>
+              <dt>Опубликованных пунктов</dt>
+              <dd>{{ publishedItems.filter((item) => item.visible).length }}</dd>
+            </div>
+          </dl>
+        </section>
+
         <section class="navigation-card">
           <div class="navigation-card__header">
             <h2>Предпросмотр меню</h2>
@@ -394,6 +428,33 @@ function publishedLabel(itemKey: string) {
   color: $text-primary;
   font-size: 13px;
   font-weight: 500;
+}
+
+.summary-list {
+  display: grid;
+  gap: 10px;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    border-top: 1px solid $border;
+    padding-top: 10px;
+  }
+
+  dt {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: $text-secondary;
+  }
+
+  dd {
+    margin: 0;
+    color: $text-primary;
+    font-weight: 500;
+    text-align: right;
+  }
 }
 
 .menu-preview {

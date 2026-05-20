@@ -12,17 +12,25 @@ import {
 const route = useRoute()
 
 const schoolSlug = computed(() =>
-  typeof route.params.slug === 'string' ? route.params.slug : ''
+  typeof route.params.slug === 'string' ? route.params.slug : '',
 )
 
 const designDraft = computed(() => ensureSchoolDesignDraft(schoolSlug.value))
 const selectedTemplateKey = computed(() => designDraft.value.draftTemplateKey)
 const publishedTemplateKey = computed(() => designDraft.value.publishedTemplateKey)
+const hasUnpublishedChanges = computed(
+  () => selectedTemplateKey.value !== publishedTemplateKey.value,
+)
 
 const selectedTemplate = computed(
   () =>
     templatePresets.find((preset) => preset.key === selectedTemplateKey.value) ??
-    templatePresets[0]
+    templatePresets[0],
+)
+const publishedTemplate = computed(
+  () =>
+    templatePresets.find((preset) => preset.key === publishedTemplateKey.value) ??
+    templatePresets[0],
 )
 
 const statusMessage = ref('')
@@ -31,19 +39,19 @@ const statusTone = ref<'idle' | 'success'>('idle')
 function chooseTemplate(preset: TemplatePreset) {
   updateSchoolDraftTemplate(schoolSlug.value, preset.key)
   statusTone.value = 'success'
-  statusMessage.value = `Шаблон "${preset.name}" сохранен в черновик.`
+  statusMessage.value = `Шаблон «${preset.name}» сохранён в черновик.`
 }
 
 function resetDraft() {
   resetSchoolDraftTemplate(schoolSlug.value)
   statusTone.value = 'success'
-  statusMessage.value = 'Черновик шаблона возвращен к опубликованной версии.'
+  statusMessage.value = 'Черновик шаблона возвращён к опубликованной версии.'
 }
 
 function publishDraft() {
   publishSchoolDraftTemplate(schoolSlug.value)
   statusTone.value = 'success'
-  statusMessage.value = `Шаблон "${selectedTemplate.value.name}" опубликован для школы.`
+  statusMessage.value = `Шаблон «${selectedTemplate.value.name}» опубликован для школы.`
 }
 
 function isSelected(key: string) {
@@ -61,14 +69,18 @@ function isPublished(key: string) {
       <div>
         <h1>Шаблоны сайта</h1>
         <p>
-          Выберите базовый шаблон школьного сайта. Сейчас настройка работает как
-          черновик: можно выбрать вариант, сравнить и затем опубликовать.
+          Выберите базовый шаблон школьного сайта. Выбор сохраняется в черновик,
+          поэтому можно спокойно сравнить варианты и опубликовать только итоговое решение.
         </p>
       </div>
 
       <div class="templates-page__actions">
-        <button class="btn btn--outline" @click="resetDraft">Сбросить черновик</button>
-        <button class="btn btn--primary" @click="publishDraft">Опубликовать шаблон</button>
+        <button class="btn btn--outline" :disabled="!hasUnpublishedChanges" @click="resetDraft">
+          Сбросить черновик
+        </button>
+        <button class="btn btn--primary" :disabled="!hasUnpublishedChanges" @click="publishDraft">
+          Опубликовать шаблон
+        </button>
       </div>
     </div>
 
@@ -145,7 +157,13 @@ function isPublished(key: string) {
 
       <aside class="templates-page__sidebar">
         <div class="templates-page__sidebar-card">
-          <h2>Текущий выбор</h2>
+          <div class="templates-page__sidebar-header">
+            <h2>Текущий выбор</h2>
+            <span class="templates-page__state-pill" :class="{ 'is-dirty': hasUnpublishedChanges }">
+              {{ hasUnpublishedChanges ? 'Есть черновик' : 'Без изменений' }}
+            </span>
+          </div>
+
           <p class="templates-page__selected-name">{{ selectedTemplate.name }}</p>
           <p class="templates-page__selected-description">
             {{ selectedTemplate.description }}
@@ -158,11 +176,7 @@ function isPublished(key: string) {
             </div>
             <div>
               <dt>Опубликовано</dt>
-              <dd>
-                {{
-                  templatePresets.find((preset) => preset.key === publishedTemplateKey)?.name
-                }}
-              </dd>
+              <dd>{{ publishedTemplate.name }}</dd>
             </div>
             <div>
               <dt>Режим меню</dt>
@@ -183,6 +197,20 @@ function isPublished(key: string) {
             <li>стиль карточек разделов и новостей</li>
             <li>компоновку меню и акцентных блоков</li>
           </ul>
+        </div>
+
+        <div class="templates-page__sidebar-card">
+          <h2>Сравнение</h2>
+          <div class="compare-grid">
+            <div>
+              <span>Опубликован</span>
+              <strong>{{ publishedTemplate.name }}</strong>
+            </div>
+            <div>
+              <span>Черновик</span>
+              <strong>{{ selectedTemplate.name }}</strong>
+            </div>
+          </div>
         </div>
       </aside>
     </div>
@@ -298,7 +326,8 @@ function isPublished(key: string) {
 }
 
 .template-card__badge,
-.state-pill {
+.state-pill,
+.templates-page__state-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -321,6 +350,17 @@ function isPublished(key: string) {
   padding: 4px 8px;
   background: rgba($gold, .22);
   color: $navy-dark;
+}
+
+.templates-page__state-pill {
+  padding: 6px 10px;
+  background: rgba($navy, .08);
+  color: $navy;
+
+  &.is-dirty {
+    background: rgba($gold, .22);
+    color: $navy-dark;
+  }
 }
 
 .preview-shell {
@@ -392,6 +432,7 @@ function isPublished(key: string) {
   padding: 20px;
 }
 
+.templates-page__sidebar-header,
 .template-card__title-row {
   display: flex;
   align-items: center;
@@ -452,6 +493,7 @@ function isPublished(key: string) {
     font-size: 14px;
     font-weight: 500;
     color: $text-primary;
+    text-align: right;
   }
 }
 
@@ -465,5 +507,32 @@ function isPublished(key: string) {
   font-size: 20px;
   font-weight: 600;
   color: $text-primary;
+}
+
+.compare-grid {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+
+  div {
+    border: 1px solid $border;
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  span {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: $text-secondary;
+  }
+
+  strong {
+    display: block;
+    margin-top: 8px;
+    color: $text-primary;
+    font-size: 16px;
+  }
 }
 </style>

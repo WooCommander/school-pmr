@@ -1,40 +1,44 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import { findSchoolBySlug } from '@/data/schools'
-import { documents } from '@/data/documents'
-import { news } from '@/data/news'
 import { teachers } from '@/data/teachers'
-import { getAdminRoleForSchool, useAdminAuth } from '@/modules/admin/state/admin-auth'
-import { ensureSchoolDesignDraft } from '@/modules/admin/state/school-design'
-import { ensureSchoolSettingsDraft } from '@/modules/admin/state/school-settings'
+import {
+  getAdminRoleForSchool,
+  getAdminRoleLabel,
+  useAdminAuth,
+} from '@/modules/admin/state/admin-auth'
+import { getSchoolDocuments } from '@/modules/admin/state/school-documents'
+import { getSchoolNews } from '@/modules/admin/state/school-news'
 import { getTemplatePresetByKey } from '@/modules/admin/data/template-presets'
 import { getThemePresetByKey } from '@/modules/admin/data/theme-presets'
+import { ensureSchoolDesignDraft } from '@/modules/admin/state/school-design'
+import { ensureSchoolSettingsDraft } from '@/modules/admin/state/school-settings'
 
 const route = useRoute()
 const { currentUser } = useAdminAuth()
 
 const schoolSlug = computed(() =>
-  typeof route.params.slug === 'string' ? route.params.slug : ''
+  typeof route.params.slug === 'string' ? route.params.slug : '',
 )
 
 const currentSchool = computed(() => findSchoolBySlug(schoolSlug.value))
 const currentRole = computed(() => getAdminRoleForSchool(schoolSlug.value))
+const currentRoleLabel = computed(() => getAdminRoleLabel(currentRole.value))
 const settingsDraft = computed(() => ensureSchoolSettingsDraft(schoolSlug.value))
 const designDraft = computed(() => ensureSchoolDesignDraft(schoolSlug.value))
 
 const selectedTemplate = computed(() =>
-  getTemplatePresetByKey(designDraft.value.draftTemplateKey)
+  getTemplatePresetByKey(designDraft.value.draftTemplateKey),
 )
 const publishedTemplate = computed(() =>
-  getTemplatePresetByKey(designDraft.value.publishedTemplateKey)
+  getTemplatePresetByKey(designDraft.value.publishedTemplateKey),
 )
 const selectedTheme = computed(() =>
-  getThemePresetByKey(designDraft.value.draftThemeKey)
+  getThemePresetByKey(designDraft.value.draftThemeKey),
 )
 const publishedTheme = computed(() =>
-  getThemePresetByKey(designDraft.value.publishedThemeKey)
+  getThemePresetByKey(designDraft.value.publishedThemeKey),
 )
 
 const publicationState = computed(() => ({
@@ -45,12 +49,10 @@ const publicationState = computed(() => ({
 }))
 
 const teacherCount = computed(
-  () => teachers.filter((item) => item.schoolSlug === schoolSlug.value).length
+  () => teachers.filter((item) => item.schoolSlug === schoolSlug.value).length,
 )
-const documentCount = computed(
-  () => documents.filter((item) => item.schoolSlug === schoolSlug.value).length
-)
-const newsCount = computed(() => news.length)
+const documentCount = computed(() => getSchoolDocuments(schoolSlug.value).length)
+const newsCount = computed(() => getSchoolNews(schoolSlug.value).length)
 
 const quickActions = computed(() => [
   {
@@ -84,13 +86,6 @@ const quickActions = computed(() => [
     to: { name: 'admin-school-content-documents-list', params: { slug: schoolSlug.value } },
   },
 ])
-
-const roleLabels: Record<string, string> = {
-  superadmin: 'Системный администратор',
-  school_admin: 'Администратор школы',
-  director: 'Директор',
-  content_manager: 'Контент-менеджер',
-}
 </script>
 
 <template>
@@ -105,7 +100,7 @@ const roleLabels: Record<string, string> = {
 
         <div class="dashboard-page__meta">
           <span>{{ currentSchool?.city }}</span>
-          <span>{{ roleLabels[currentRole || ''] || currentRole || 'Роль не задана' }}</span>
+          <span>{{ currentRoleLabel || 'Роль не задана' }}</span>
           <span>{{ currentUser?.name }}</span>
         </div>
       </div>
@@ -120,10 +115,12 @@ const roleLabels: Record<string, string> = {
 
           <ul class="status-list">
             <li :class="{ 'status-list__item--dirty': publicationState.templateDirty }">
-              Шаблон: {{ publicationState.templateDirty ? 'черновик отличается' : 'актуален' }}
+              Шаблон:
+              {{ publicationState.templateDirty ? 'черновик отличается' : 'актуален' }}
             </li>
             <li :class="{ 'status-list__item--dirty': publicationState.themeDirty }">
-              Тема: {{ publicationState.themeDirty ? 'черновик отличается' : 'актуальна' }}
+              Тема:
+              {{ publicationState.themeDirty ? 'черновик отличается' : 'актуальна' }}
             </li>
           </ul>
 

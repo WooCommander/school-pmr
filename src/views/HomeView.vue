@@ -1,12 +1,16 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import NewsCard from '@/components/NewsCard.vue'
-import { news } from '@/data/news'
 import { useCurrentSchool } from '@/composables/useCurrentSchool'
+import { getPublishedSchoolNews } from '@/modules/admin/state/school-news'
 
 const route = useRoute()
 const { school } = useCurrentSchool()
-const latestNews = news.slice(0, 4)
+const schoolSlug = computed(() =>
+  typeof route.params.slug === 'string' ? route.params.slug : school.value.slug,
+)
+const latestNews = computed(() => getPublishedSchoolNews(schoolSlug.value).slice(0, 4))
 
 const quickLinks = [
   { name: 'school-news', label: 'Новости', icon: 'news' },

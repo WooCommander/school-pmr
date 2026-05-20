@@ -87,6 +87,10 @@ export function ensureSchoolSettingsDraft(schoolSlug: string) {
   return state.drafts[schoolSlug]
 }
 
+export function getDefaultSchoolSettingsDraft(schoolSlug: string) {
+  return makeDefaultDraft(schoolSlug)
+}
+
 export function updateSchoolGeneralDraft(schoolSlug: string, payload: SchoolGeneralDraft) {
   ensureSchoolSettingsDraft(schoolSlug)
   state.drafts[schoolSlug].general = { ...payload }
@@ -114,6 +118,11 @@ export function resetSchoolContactsDraft(schoolSlug: string) {
     ...current,
     contacts: makeDefaultDraft(schoolSlug).contacts,
   }
+  persistState()
+}
+
+export function resetAllSchoolSettingsDrafts(schoolSlug: string) {
+  state.drafts[schoolSlug] = makeDefaultDraft(schoolSlug)
   persistState()
 }
 

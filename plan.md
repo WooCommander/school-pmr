@@ -1806,4 +1806,4 @@ HistoryPage.vue (line 1)
 оживить SelectSchoolPage
 реализовать DashboardPage
 затем GeneralPage и TemplatesPage
-Если хотите, следующим сообщением я начну именно с admin auth scaffold + route guards + school selection mock.
+Если хотите, следующим сообщением я начну именно с admin auth scaffold + route guards + school selection mo

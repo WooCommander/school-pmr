@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { themePresets, type ThemePreset } from '@/modules/admin/data/theme-presets'
 import {
   ensureSchoolDesignDraft,
+  getDefaultSchoolDesignDraft,
   publishSchoolDraftTheme,
   resetSchoolDraftTheme,
   updateSchoolDraftTheme,
@@ -12,17 +13,25 @@ import {
 const route = useRoute()
 
 const schoolSlug = computed(() =>
-  typeof route.params.slug === 'string' ? route.params.slug : ''
+  typeof route.params.slug === 'string' ? route.params.slug : '',
 )
 
 const designDraft = computed(() => ensureSchoolDesignDraft(schoolSlug.value))
+const defaultDesignDraft = computed(() => getDefaultSchoolDesignDraft(schoolSlug.value))
 const selectedThemeKey = computed(() => designDraft.value.draftThemeKey)
 const publishedThemeKey = computed(() => designDraft.value.publishedThemeKey)
+const hasUnpublishedChanges = computed(
+  () => selectedThemeKey.value !== publishedThemeKey.value,
+)
+const differsFromDefault = computed(
+  () => selectedThemeKey.value !== defaultDesignDraft.value.draftThemeKey,
+)
 
 const selectedTheme = computed(
-  () =>
-    themePresets.find((preset) => preset.key === selectedThemeKey.value) ??
-    themePresets[0]
+  () => themePresets.find((preset) => preset.key === selectedThemeKey.value) ?? themePresets[0],
+)
+const publishedTheme = computed(
+  () => themePresets.find((preset) => preset.key === publishedThemeKey.value) ?? themePresets[0],
 )
 
 const statusMessage = ref('')
@@ -31,19 +40,19 @@ const statusTone = ref<'idle' | 'success'>('idle')
 function chooseTheme(preset: ThemePreset) {
   updateSchoolDraftTheme(schoolSlug.value, preset.key)
   statusTone.value = 'success'
-  statusMessage.value = `Тема "${preset.name}" сохранена в черновик.`
+  statusMessage.value = `Тема «${preset.name}» сохранена в черновик.`
 }
 
 function resetDraft() {
   resetSchoolDraftTheme(schoolSlug.value)
   statusTone.value = 'success'
-  statusMessage.value = 'Черновик темы возвращен к опубликованной версии.'
+  statusMessage.value = 'Черновик темы возвращён к опубликованной версии.'
 }
 
 function publishDraft() {
   publishSchoolDraftTheme(schoolSlug.value)
   statusTone.value = 'success'
-  statusMessage.value = `Тема "${selectedTheme.value.name}" опубликована для школы.`
+  statusMessage.value = `Тема «${selectedTheme.value.name}» опубликована для школы.`
 }
 
 function isSelected(key: string) {
@@ -61,14 +70,18 @@ function isPublished(key: string) {
       <div>
         <h1>Цветовые темы</h1>
         <p>
-          Выберите цветовую тему для школьного сайта. Темы управляют основным,
-          вторичным и акцентным цветом, а также общим ощущением интерфейса.
+          Выберите цветовую тему для школьного сайта. Тема управляет основными,
+          вторичными и акцентными цветами, а также общим ощущением интерфейса.
         </p>
       </div>
 
       <div class="themes-page__actions">
-        <button class="btn btn--outline" @click="resetDraft">Сбросить черновик</button>
-        <button class="btn btn--primary" @click="publishDraft">Опубликовать тему</button>
+        <button class="btn btn--outline" :disabled="!hasUnpublishedChanges" @click="resetDraft">
+          Сбросить черновик
+        </button>
+        <button class="btn btn--primary" :disabled="!hasUnpublishedChanges" @click="publishDraft">
+          Опубликовать тему
+        </button>
       </div>
     </div>
 
@@ -130,7 +143,10 @@ function isPublished(key: string) {
               <span v-if="isPublished(preset.key)" class="state-pill">Опубликована</span>
             </div>
 
-            <div class="theme-card__contrast">{{ preset.contrastLabel }}</div>
+            <div class="theme-card__meta-row">
+              <span class="theme-card__contrast">{{ preset.contrastLabel }}</span>
+              <span class="theme-card__hex">{{ preset.colors.primary }}</span>
+            </div>
 
             <button
               class="btn"
@@ -145,11 +161,15 @@ function isPublished(key: string) {
 
       <aside class="themes-page__sidebar">
         <div class="themes-page__sidebar-card">
-          <h2>Текущий выбор</h2>
+          <div class="themes-page__sidebar-header">
+            <h2>Текущий выбор</h2>
+            <span class="themes-page__state-pill" :class="{ 'is-dirty': hasUnpublishedChanges }">
+              {{ hasUnpublishedChanges ? 'Есть черновик' : 'Без изменений' }}
+            </span>
+          </div>
+
           <p class="themes-page__selected-name">{{ selectedTheme.name }}</p>
-          <p class="themes-page__selected-description">
-            {{ selectedTheme.description }}
-          </p>
+          <p class="themes-page__selected-description">{{ selectedTheme.description }}</p>
 
           <dl class="summary-list">
             <div>
@@ -158,15 +178,11 @@ function isPublished(key: string) {
             </div>
             <div>
               <dt>Опубликовано</dt>
-              <dd>
-                {{
-                  themePresets.find((preset) => preset.key === publishedThemeKey)?.name
-                }}
-              </dd>
+              <dd>{{ publishedTheme.name }}</dd>
             </div>
             <div>
-              <dt>Основной</dt>
-              <dd>{{ selectedTheme.colors.primary }}</dd>
+              <dt>Отличается от дефолта</dt>
+              <dd>{{ differsFromDefault ? 'Да' : 'Нет' }}</dd>
             </div>
             <div>
               <dt>Акцент</dt>
@@ -183,6 +199,22 @@ function isPublished(key: string) {
             <li>фоновые поверхности и контраст блоков</li>
             <li>общее визуальное настроение сайта</li>
           </ul>
+        </div>
+
+        <div class="themes-page__sidebar-card">
+          <h2>Сравнение</h2>
+          <div class="compare-grid">
+            <div>
+              <span>Опубликована</span>
+              <strong>{{ publishedTheme.name }}</strong>
+              <small>{{ publishedTheme.colors.primary }}</small>
+            </div>
+            <div>
+              <span>Черновик</span>
+              <strong>{{ selectedTheme.name }}</strong>
+              <small>{{ selectedTheme.colors.primary }}</small>
+            </div>
+          </div>
         </div>
       </aside>
     </div>
@@ -358,6 +390,7 @@ function isPublished(key: string) {
   padding: 20px;
 }
 
+.themes-page__sidebar-header,
 .theme-card__title-row {
   display: flex;
   align-items: flex-start;
@@ -378,16 +411,54 @@ function isPublished(key: string) {
   line-height: 1.6;
 }
 
-.theme-card__contrast {
+.theme-card__meta-row {
   margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.theme-card__contrast,
+.theme-card__hex,
+.themes-page__state-pill,
+.state-pill {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+
+.theme-card__contrast {
   padding: 6px 10px;
-  font-size: 12px;
-  font-weight: 600;
   color: $navy-dark;
   background: rgba($navy, .08);
+}
+
+.theme-card__hex {
+  padding: 6px 10px;
+  color: $text-secondary;
+  background: $surface;
+}
+
+.themes-page__state-pill {
+  padding: 6px 10px;
+  background: rgba($navy, .08);
+  color: $navy;
+
+  &.is-dirty {
+    background: rgba($gold, .22);
+    color: $navy-dark;
+  }
+}
+
+.state-pill {
+  padding: 4px 8px;
+  background: rgba($gold, .22);
+  color: $navy-dark;
 }
 
 .theme-card__meta .btn {
@@ -420,20 +491,8 @@ function isPublished(key: string) {
     font-size: 14px;
     font-weight: 500;
     color: $text-primary;
+    text-align: right;
   }
-}
-
-.state-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  padding: 4px 8px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .03em;
-  background: rgba($gold, .22);
-  color: $navy-dark;
 }
 
 .themes-page__selected-name {
@@ -454,6 +513,39 @@ function isPublished(key: string) {
     color: $text-secondary;
     line-height: 1.5;
     font-size: 14px;
+  }
+}
+
+.compare-grid {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+
+  div {
+    border: 1px solid $border;
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  span {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: $text-secondary;
+  }
+
+  strong {
+    display: block;
+    margin-top: 8px;
+    color: $text-primary;
+    font-size: 16px;
+  }
+
+  small {
+    display: block;
+    margin-top: 6px;
+    color: $text-secondary;
   }
 }
 </style>

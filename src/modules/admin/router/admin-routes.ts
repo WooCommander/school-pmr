@@ -30,6 +30,10 @@ export const adminRoutes: RouteRecordRaw[] = [
       requiresAdminAuth: true,
       requiresSchoolAccess: true,
     },
+    redirect: (to) => ({
+      name: 'admin-school-dashboard',
+      params: { slug: to.params.slug },
+    }),
     children: [
       {
         path: 'dashboard',

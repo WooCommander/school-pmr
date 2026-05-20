@@ -54,7 +54,7 @@ export const themePresets: ThemePreset[] = [
   {
     key: 'emerald',
     name: 'Emerald',
-    description: 'Спокойная академическая тема с зеленым акцентом.',
+    description: 'Спокойная академическая тема с зелёным акцентом.',
     contrastLabel: 'Сбалансированная',
     colors: {
       primary: '#1E5C4A',
@@ -106,7 +106,7 @@ export const themePresets: ThemePreset[] = [
   {
     key: 'terracotta',
     name: 'Terracotta',
-    description: 'Теплая тема с живым акцентом для более дружелюбной подачи сайта.',
+    description: 'Тёплая тема с живым акцентом для более дружелюбной подачи сайта.',
     contrastLabel: 'Комфортная',
     colors: {
       primary: '#A14E3B',

@@ -36,9 +36,7 @@ export const mockAdminUsers: AdminUser[] = [
     email: 'school1@pmr.local',
     password: 'school123',
     name: 'Администратор ДнСШ №1',
-    accesses: [
-      { schoolSlug: 'dnestrovsk-school-1', role: 'school_admin' },
-    ],
+    accesses: [{ schoolSlug: 'dnestrovsk-school-1', role: 'school_admin' }],
   },
   {
     id: 3,
