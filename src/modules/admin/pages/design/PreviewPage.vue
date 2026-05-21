@@ -558,11 +558,12 @@ function sectionTitle() {
   flex-wrap: wrap;
 
   @media (max-width: $mobile-breakpoint) {
-    flex-wrap: nowrap;
+    display: block;
     overflow-x: auto;
-    width: calc(100% + 32px);
-    margin-inline: -16px;
-    padding: 0 16px 6px;
+    white-space: nowrap;
+    width: calc(100% + 28px);
+    margin-inline: -14px;
+    padding: 0 14px 6px;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -623,11 +624,12 @@ function sectionTitle() {
   margin-top: 14px;
 
   @media (max-width: $mobile-breakpoint) {
-    flex-wrap: nowrap;
+    display: block;
     overflow-x: auto;
-    width: calc(100% + 32px);
-    margin-inline: -16px;
-    padding: 0 16px 6px;
+    white-space: nowrap;
+    width: calc(100% + 28px);
+    margin-inline: -14px;
+    padding: 0 14px 6px;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -643,7 +645,7 @@ function sectionTitle() {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 
   @media (max-width: $mobile-breakpoint) {
-    display: flex;
+    display: block;
     grid-template-columns: none;
   }
 }
@@ -1109,9 +1111,12 @@ function sectionTitle() {
   flex-wrap: wrap;
 
   @media (max-width: $mobile-breakpoint) {
-    flex-wrap: nowrap;
+    display: block;
     overflow-x: auto;
-    padding-bottom: 6px;
+    white-space: nowrap;
+    width: calc(100% + 28px);
+    margin-inline: -14px;
+    padding: 0 14px 6px;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;

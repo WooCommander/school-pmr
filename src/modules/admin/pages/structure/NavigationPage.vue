@@ -464,11 +464,12 @@ function publishedVisibility(itemKey: string) {
   gap: 10px;
 
   @media (max-width: $mobile-breakpoint) {
-    flex-wrap: nowrap;
+    display: block;
     overflow-x: auto;
-    width: calc(100% + 32px);
-    margin-inline: -16px;
-    padding: 0 16px 6px;
+    white-space: nowrap;
+    width: calc(100% + 28px);
+    margin-inline: -14px;
+    padding: 0 14px 6px;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
