@@ -9,6 +9,9 @@ export interface SchoolGeneralDraft {
   type: string
   city: string
   description: string
+  studentsCount: string
+  classesCount: string
+  foundedYear: string
 }
 
 export interface SchoolContactsDraft {
@@ -43,8 +46,11 @@ function makeDefaultDraft(schoolSlug: string): SchoolSettingsDraft {
       type: school?.type ?? '',
       city: school?.city ?? '',
       description: school
-        ? `${school.fullName} — публичный сайт школы в единой системе управления.`
+        ? `${school.fullName} вЂ” РїСѓР±Р»РёС‡РЅС‹Р№ СЃР°Р№С‚ С€РєРѕР»С‹ РІ РµРґРёРЅРѕР№ СЃРёСЃС‚РµРјРµ СѓРїСЂР°РІР»РµРЅРёСЏ.`
         : '',
+      studentsCount: school?.stats[0]?.value ?? '',
+      classesCount: school?.stats[2]?.value ?? '',
+      foundedYear: school?.stats[3]?.value ?? '',
     },
     contacts: {
       address: school?.address ?? '',
@@ -57,6 +63,21 @@ function makeDefaultDraft(schoolSlug: string): SchoolSettingsDraft {
   }
 }
 
+function normalizeDraft(schoolSlug: string, draft?: Partial<SchoolSettingsDraft> | null): SchoolSettingsDraft {
+  const defaults = makeDefaultDraft(schoolSlug)
+
+  return {
+    general: {
+      ...defaults.general,
+      ...draft?.general,
+    },
+    contacts: {
+      ...defaults.contacts,
+      ...draft?.contacts,
+    },
+  }
+}
+
 function loadState() {
   if (typeof window === 'undefined') return
 
@@ -64,8 +85,13 @@ function loadState() {
   if (!raw) return
 
   try {
-    const parsed = JSON.parse(raw) as SchoolSettingsMap
-    state.drafts = parsed
+    const parsed = JSON.parse(raw) as Record<string, Partial<SchoolSettingsDraft>>
+    state.drafts = Object.fromEntries(
+      Object.entries(parsed).map(([schoolSlug, draft]) => [
+        schoolSlug,
+        normalizeDraft(schoolSlug, draft),
+      ]),
+    )
   } catch {
     window.localStorage.removeItem(STORAGE_KEY)
   }
@@ -82,6 +108,13 @@ export function ensureSchoolSettingsDraft(schoolSlug: string) {
   if (!state.drafts[schoolSlug]) {
     state.drafts[schoolSlug] = makeDefaultDraft(schoolSlug)
     persistState()
+  } else {
+    const normalizedDraft = normalizeDraft(schoolSlug, state.drafts[schoolSlug])
+
+    if (JSON.stringify(normalizedDraft) !== JSON.stringify(state.drafts[schoolSlug])) {
+      state.drafts[schoolSlug] = normalizedDraft
+      persistState()
+    }
   }
 
   return state.drafts[schoolSlug]

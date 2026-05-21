@@ -98,9 +98,8 @@ function formatDate(date: string) {
     display: block;
     overflow-x: auto;
     white-space: nowrap;
-    width: calc(100% + 32px);
-    margin-inline: -16px;
-    padding: 0 16px 6px;
+    max-width: 100%;
+    padding: 0 0 6px;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;

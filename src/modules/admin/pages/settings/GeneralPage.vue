@@ -25,6 +25,9 @@ const form = reactive({
   type: '',
   city: '',
   description: '',
+  studentsCount: '',
+  classesCount: '',
+  foundedYear: '',
 })
 
 const statusMessage = ref('')
@@ -37,6 +40,9 @@ function syncForm() {
   form.type = draft.type
   form.city = draft.city
   form.description = draft.description
+  form.studentsCount = draft.studentsCount
+  form.classesCount = draft.classesCount
+  form.foundedYear = draft.foundedYear
 }
 
 watch(
@@ -61,6 +67,9 @@ const normalizedForm = computed(() => ({
   type: form.type.trim(),
   city: form.city.trim(),
   description: form.description.trim(),
+  studentsCount: form.studentsCount.trim(),
+  classesCount: form.classesCount.trim(),
+  foundedYear: form.foundedYear.trim(),
 }))
 
 const validationErrors = computed(() => {
@@ -86,6 +95,18 @@ const validationErrors = computed(() => {
     errors.push('Описание должно быть не короче 20 символов.')
   }
 
+  if (!normalizedForm.value.studentsCount || !/^\d+$/.test(normalizedForm.value.studentsCount)) {
+    errors.push('Количество учеников должно быть указано числом.')
+  }
+
+  if (!normalizedForm.value.classesCount || !/^\d+$/.test(normalizedForm.value.classesCount)) {
+    errors.push('Количество классов должно быть указано числом.')
+  }
+
+  if (!normalizedForm.value.foundedYear || !/^\d{4}$/.test(normalizedForm.value.foundedYear)) {
+    errors.push('Год основания должен состоять из 4 цифр.')
+  }
+
   return errors
 })
 
@@ -105,7 +126,7 @@ function save() {
 
   updateSchoolGeneralDraft(schoolSlug.value, normalizedForm.value)
   statusTone.value = 'success'
-  statusMessage.value = 'Черновик общей информации сохранён.'
+  statusMessage.value = 'Черновик профиля школы сохранен.'
 }
 
 function reset() {
@@ -122,8 +143,8 @@ function reset() {
       <div>
         <h1>Общая информация</h1>
         <p>
-          Базовые данные школы: полное и краткое название, тип школы, город и
-          описание. Эти поля используются в админке, предпросмотре и публичном профиле.
+          Базовые данные школы, которые используются в админке, превью и на публичном сайте:
+          название, тип, город, описание и hero-метрики.
         </p>
       </div>
 
@@ -148,9 +169,9 @@ function reset() {
     <div class="general-page__grid">
       <div class="general-page__card">
         <div class="general-page__card-header">
-          <h2>Основные данные</h2>
+          <h2>Профиль школы</h2>
           <span class="general-page__state-pill" :class="{ 'is-dirty': isDirty }">
-            {{ isDirty ? 'Есть несохранённые изменения' : 'Черновик сохранён' }}
+            {{ isDirty ? 'Есть несохраненные изменения' : 'Черновик сохранен' }}
           </span>
         </div>
 
@@ -176,9 +197,32 @@ function reset() {
           </label>
 
           <label class="field field--full">
-            <span>Описание</span>
+            <span>Описание для hero</span>
             <textarea v-model="form.description" rows="6"></textarea>
           </label>
+        </div>
+
+        <div class="stats-grid">
+          <label class="field">
+            <span>Учеников</span>
+            <input v-model="form.studentsCount" type="text" inputmode="numeric" />
+          </label>
+
+          <label class="field">
+            <span>Классов</span>
+            <input v-model="form.classesCount" type="text" inputmode="numeric" />
+          </label>
+
+          <label class="field">
+            <span>Год основания</span>
+            <input v-model="form.foundedYear" type="text" inputmode="numeric" />
+          </label>
+
+          <div class="stats-note">
+            <strong>Педагогов</strong>
+            <span>{{ currentSchool?.stats?.[1]?.value || '—' }}</span>
+            <p>Считается автоматически из раздела педагогов и отдельно здесь не редактируется.</p>
+          </div>
         </div>
 
         <ul v-if="validationErrors.length" class="validation-list">
@@ -188,7 +232,7 @@ function reset() {
 
       <div class="general-page__side">
         <div class="general-page__card">
-          <h2>Предпросмотр профиля</h2>
+          <h2>Превью hero</h2>
 
           <div class="school-preview">
             <p class="school-preview__eyebrow">{{ form.type || 'Тип школы' }}</p>
@@ -198,6 +242,25 @@ function reset() {
             <p class="school-preview__description">
               {{ form.description || 'Описание школы появится здесь.' }}
             </p>
+
+            <div class="school-preview__stats">
+              <div class="school-preview__stat">
+                <strong>{{ form.studentsCount || '0' }}</strong>
+                <span>учеников</span>
+              </div>
+              <div class="school-preview__stat">
+                <strong>{{ currentSchool?.stats?.[1]?.value || '0' }}</strong>
+                <span>педагогов</span>
+              </div>
+              <div class="school-preview__stat">
+                <strong>{{ form.classesCount || '0' }}</strong>
+                <span>классов</span>
+              </div>
+              <div class="school-preview__stat">
+                <strong>{{ form.foundedYear || '—' }}</strong>
+                <span>год основания</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -331,7 +394,8 @@ function reset() {
   }
 }
 
-.form-grid {
+.form-grid,
+.stats-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
@@ -339,6 +403,10 @@ function reset() {
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
+}
+
+.stats-grid {
+  margin-top: 14px;
 }
 
 .field {
@@ -372,6 +440,39 @@ function reset() {
   textarea:focus {
     outline: none;
     border-color: $navy;
+  }
+}
+
+.stats-note {
+  grid-column: 1 / -1;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba($navy, .04);
+  border: 1px solid rgba($navy, .08);
+
+  strong,
+  span,
+  p {
+    display: block;
+  }
+
+  strong {
+    font-size: 13px;
+    color: $navy;
+  }
+
+  span {
+    margin-top: 6px;
+    font-size: 24px;
+    font-weight: 700;
+    color: $text-primary;
+  }
+
+  p {
+    margin-top: 8px;
+    color: $text-secondary;
+    line-height: 1.5;
+    font-size: 13px;
   }
 }
 
@@ -416,6 +517,37 @@ function reset() {
   margin-top: 10px;
   line-height: 1.6;
   color: rgba($white, .88);
+}
+
+.school-preview__stats {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.school-preview__stat {
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .1);
+
+  strong,
+  span {
+    display: block;
+  }
+
+  strong {
+    font-size: 20px;
+    font-weight: 700;
+    color: $white;
+  }
+
+  span {
+    margin-top: 6px;
+    color: rgba($white, .68);
+    font-size: 12px;
+  }
 }
 
 .summary-list {

@@ -561,9 +561,8 @@ function sectionTitle() {
     display: block;
     overflow-x: auto;
     white-space: nowrap;
-    width: calc(100% + 28px);
-    margin-inline: -14px;
-    padding: 0 14px 6px;
+    max-width: 100%;
+    padding: 0 0 6px;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -627,9 +626,8 @@ function sectionTitle() {
     display: block;
     overflow-x: auto;
     white-space: nowrap;
-    width: calc(100% + 28px);
-    margin-inline: -14px;
-    padding: 0 14px 6px;
+    max-width: 100%;
+    padding: 0 0 6px;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -1114,9 +1112,8 @@ function sectionTitle() {
     display: block;
     overflow-x: auto;
     white-space: nowrap;
-    width: calc(100% + 28px);
-    margin-inline: -14px;
-    padding: 0 14px 6px;
+    max-width: 100%;
+    padding: 0 0 6px;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;

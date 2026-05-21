@@ -58,6 +58,7 @@ const sections = computed(() => [
       { label: 'Новая новость', icon: '+', to: { name: 'admin-school-content-news-create', params: { slug: schoolSlug.value } } },
       { label: 'Документы', icon: '▥', to: { name: 'admin-school-content-documents-list', params: { slug: schoolSlug.value } } },
       { label: 'Новый документ', icon: '+', to: { name: 'admin-school-content-documents-create', params: { slug: schoolSlug.value } } },
+      { label: 'Обращения', icon: '✎', to: { name: 'admin-school-content-inquiries-list', params: { slug: schoolSlug.value } } },
     ],
   },
   {

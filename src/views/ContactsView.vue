@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useCurrentSchool } from '@/composables/useCurrentSchool'
+import { createSchoolInquiry } from '@/modules/admin/state/school-inquiries'
 import { getAdministrationBySchoolState } from '@/modules/teachers/state/teacher-directory'
 
 const { school } = useCurrentSchool()
@@ -33,6 +34,63 @@ const contacts = computed(() => [
 ])
 
 const administration = computed(() => getAdministrationBySchoolState(school.value.slug))
+
+const inquiryForm = reactive({
+  name: '',
+  contact: '',
+  topic: '',
+  message: '',
+})
+
+const inquiryStatus = ref<'idle' | 'success' | 'error'>('idle')
+const inquiryMessage = ref('')
+
+const normalizedInquiry = computed(() => ({
+  name: inquiryForm.name.trim(),
+  contact: inquiryForm.contact.trim(),
+  topic: inquiryForm.topic.trim(),
+  message: inquiryForm.message.trim(),
+}))
+
+const inquiryErrors = computed(() => {
+  const errors: string[] = []
+
+  if (normalizedInquiry.value.name.length < 2) {
+    errors.push('Укажите имя или представьтесь.')
+  }
+
+  if (normalizedInquiry.value.contact.length < 5) {
+    errors.push('Укажите контакт для обратной связи.')
+  }
+
+  if (normalizedInquiry.value.topic.length < 4) {
+    errors.push('Укажите тему обращения.')
+  }
+
+  if (normalizedInquiry.value.message.length < 12) {
+    errors.push('Сообщение должно быть не короче 12 символов.')
+  }
+
+  return errors
+})
+
+function submitInquiry() {
+  if (inquiryErrors.value.length) {
+    inquiryStatus.value = 'error'
+    inquiryMessage.value = inquiryErrors.value[0]
+    return
+  }
+
+  createSchoolInquiry(school.value.slug, normalizedInquiry.value)
+
+  inquiryForm.name = ''
+  inquiryForm.contact = ''
+  inquiryForm.topic = ''
+  inquiryForm.message = ''
+
+  inquiryStatus.value = 'success'
+  inquiryMessage.value = 'Обращение отправлено. Оно попадет в админку школы и пройдет модерацию.'
+}
 </script>
 
 <template>
@@ -140,6 +198,59 @@ const administration = computed(() => getAdministrationBySchoolState(school.valu
         </div>
       </div>
 
+      <div class="inquiry-layout">
+        <section class="inquiry-card">
+          <div class="inquiry-card__header">
+            <h2>Задать вопрос</h2>
+            <p>
+              Сообщение не публикуется на сайте. Оно уходит в админку школы и проходит внутреннюю
+              модерацию.
+            </p>
+          </div>
+
+          <div
+            v-if="inquiryMessage"
+            class="inquiry-status"
+            :class="`inquiry-status--${inquiryStatus}`"
+          >
+            {{ inquiryMessage }}
+          </div>
+
+          <div class="inquiry-form">
+            <label class="field">
+              <span>Имя</span>
+              <input v-model="inquiryForm.name" type="text" />
+            </label>
+
+            <label class="field">
+              <span>Контакт</span>
+              <input v-model="inquiryForm.contact" type="text" placeholder="Email или телефон" />
+            </label>
+
+            <label class="field field--full">
+              <span>Тема</span>
+              <input v-model="inquiryForm.topic" type="text" />
+            </label>
+
+            <label class="field field--full">
+              <span>Сообщение</span>
+              <textarea v-model="inquiryForm.message" rows="6"></textarea>
+            </label>
+          </div>
+
+          <button class="btn btn--primary" @click="submitInquiry">Отправить обращение</button>
+        </section>
+
+        <section class="inquiry-note">
+          <h2>Как это работает</h2>
+          <ul>
+            <li>обращение попадает в закрытый список внутри админки школы;</li>
+            <li>администратор меняет статус: новое, в работе, отвечено или отклонено;</li>
+            <li>сообщения не публикуются на сайте автоматически.</li>
+          </ul>
+        </section>
+      </div>
+
       <h2 class="admin-title">Администрация</h2>
       <div class="admin-grid">
         <div v-for="item in administration" :key="item.name" class="admin-card">
@@ -157,7 +268,7 @@ const administration = computed(() => getAdministrationBySchoolState(school.valu
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 
   @media (max-width: $mobile-breakpoint) {
     grid-template-columns: 1fr;
@@ -242,6 +353,118 @@ const administration = computed(() => getAdministrationBySchoolState(school.valu
 .map-placeholder__hint {
   font-size: 12px !important;
   opacity: .7;
+}
+
+.inquiry-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(280px, .7fr);
+  gap: 20px;
+  margin-bottom: 40px;
+
+  @media (max-width: 980px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.inquiry-card,
+.inquiry-note {
+  background: $white;
+  border: 1px solid var(--school-card-border);
+  border-radius: var(--school-card-radius);
+  padding: 20px;
+}
+
+.inquiry-card__header,
+.inquiry-note {
+  h2 {
+    font-size: 20px;
+    color: var(--school-primary);
+  }
+
+  p {
+    margin-top: 8px;
+    color: $text-secondary;
+    line-height: 1.6;
+  }
+}
+
+.inquiry-status {
+  margin-top: 14px;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 500;
+
+  &--success {
+    background: rgba(45, 138, 78, .12);
+    color: #20623a;
+  }
+
+  &--error {
+    background: rgba(180, 35, 24, .10);
+    color: #912018;
+  }
+}
+
+.inquiry-form {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+
+  @media (max-width: $mobile-breakpoint) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &--full {
+    grid-column: 1 / -1;
+  }
+
+  span {
+    font-size: 13px;
+    font-weight: 500;
+    color: $text-primary;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    border: 1px solid $border;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font: inherit;
+    color: $text-primary;
+    background: $white;
+    resize: vertical;
+  }
+
+  input:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--school-primary);
+  }
+}
+
+.inquiry-card .btn {
+  margin-top: 16px;
+}
+
+.inquiry-note ul {
+  margin-top: 14px;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+
+  li {
+    color: $text-secondary;
+    line-height: 1.5;
+  }
 }
 
 .admin-title {

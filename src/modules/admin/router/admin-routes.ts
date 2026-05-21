@@ -126,6 +126,11 @@ export const adminRoutes: RouteRecordRaw[] = [
         component: () => import('@/modules/admin/pages/content/DocumentEditPage.vue'),
       },
       {
+        path: 'content/inquiries',
+        name: 'admin-school-content-inquiries-list',
+        component: () => import('@/modules/admin/pages/content/InquiriesListPage.vue'),
+      },
+      {
         path: 'users',
         name: 'admin-school-users-list',
         component: () => import('@/modules/admin/pages/users/UsersListPage.vue'),

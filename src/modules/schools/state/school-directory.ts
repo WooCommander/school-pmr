@@ -50,14 +50,29 @@ function applyDerivedContent(school: SchoolProfile, general?: SchoolGeneralDraft
 
 function applyDerivedStats(school: SchoolProfile): SchoolProfile {
   const teacherCount = getTeacherCountBySchoolState(school.slug)
+  const general = peekSchoolSettingsDraft(school.slug)?.general
 
   return {
     ...school,
-    stats: school.stats.map((item) =>
-      item.label.toLowerCase() === 'педагогов'
-        ? { ...item, value: String(teacherCount) }
-        : item,
-    ),
+    stats: school.stats.map((item, index) => {
+      if (index === 0) {
+        return { ...item, value: general?.studentsCount || item.value }
+      }
+
+      if (index === 1) {
+        return { ...item, value: String(teacherCount) }
+      }
+
+      if (index === 2) {
+        return { ...item, value: general?.classesCount || item.value }
+      }
+
+      if (index === 3) {
+        return { ...item, value: general?.foundedYear || item.value }
+      }
+
+      return item
+    }),
   }
 }
 
